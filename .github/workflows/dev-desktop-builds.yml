@@ -283,8 +283,9 @@ jobs:
         if: ${{ github.event.inputs.android_release == 'true' }}
         run: |
           mkdir -p ./android/build
-          unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION.${GODOT_SUB}/android_source.zip -d android/build
+          unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION}.${GODOT_SUB}/android_source.zip -d ./android/build
           touch ./android/build/.gdignore
+          echo "${GODOT_VERSION}.${GODOT_SUB}" > ./android/.build_version
       - name: Export Android release (apk + aab)
         if: ${{ github.event.inputs.android_release == 'true' }}  
         env:
