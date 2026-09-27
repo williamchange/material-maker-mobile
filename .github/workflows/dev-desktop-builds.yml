@@ -11,32 +11,32 @@ on:
         description: "Generate artifacts"
         type: boolean
         required: true
-        default: "false"
+        default: false
       sign_macos:
         description: "Sign macOS version"
         type: boolean
         required: true
-        default: "false"
+        default: false
       android_release:
-        description: "Generate Android release apk"
+        description: "Generate Android release"
         type: boolean
         required: true
-        default: "false"
+        default: false
       gen_doc:
         description: "Generate documentation"
         type: boolean
         required: true
-        default: "true"
+        default: true
       steam:
         description: "Generate Steam version"
         type: boolean
         required: true
-        default: "false"
+        default: false
       steam_deploy:
         description: "Upload Steam version"
         type: boolean
         required: true
-        default: "false"
+        default: false
 
 env:
   GODOT_VERSION: 4.7.2
@@ -276,30 +276,44 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.${GODOT_SUB}
           mv ./templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.${GODOT_SUB}
           mkdir -v -p ./build/android
-      - name: Export Android debug apk
+      - name: Export Android debug (apk)
         run: |
           ./Godot_v${GODOT_VERSION}-${GODOT_SUB}_linux.x86_64 --headless --export-debug "Android" ./build/android/${EXPORT_NAME}_${MM_RELEASE}_android_debug.apk
-      - name: Export Android release apk
+      - name: Setup Android build template
+        if: ${{ github.event.inputs.android_release == 'true' }}
+        run: |
+          mkdir -p ./android/build
+          unzip -q ~/.local/share/godot/export_templates/${GODOT_VERSION.${GODOT_SUB}/android_source.zip -d android/build
+          touch android/build/.gdignore
+      - name: Export Android release (apk + aab)
         if: ${{ github.event.inputs.android_release == 'true' }}  
         env:
-          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: "./tmp/release.keystore"
+          GODOT_ANDROID_KEYSTORE_RELEASE_PATH: "/tmp/release.keystore"
           GODOT_ANDROID_KEYSTORE_RELEASE_USER: ${{ secrets.KEY_ALIAS }}
           GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
           echo "${{ secrets.KEYSTORE }}" | base64 -d > /tmp/release.keystore
           ./Godot_v${GODOT_VERSION}-${GODOT_SUB}_linux.x86_64 --headless --export-release "Android" ./build/android/${EXPORT_NAME}_${MM_RELEASE}_android_release.apk
+          ./Godot_v${GODOT_VERSION}-${GODOT_SUB}_linux.x86_64 --headless --export-release "Android AAB" ./build/android/${EXPORT_NAME}_${MM_RELEASE}_android_release.aab
       - name: Upload Android debug artifact
         if: ${{ github.event.inputs.artifacts == 'true' }}
         uses: actions/upload-artifact@v7
         with:
           name: android_debug_snapshot
           path: ./build/android/${{ env.EXPORT_NAME }}_${{ env.MM_RELEASE }}_android_debug.apk
-      - name: Upload Android release artifact
+      - name: Upload Android release apk
         if: ${{ github.event.inputs.android_release == 'true' && github.event.inputs.artifacts == 'true' }}
         uses: actions/upload-artifact@v7
         with:
           name: android_release_snapshot
           path: ./build/android/${{ env.EXPORT_NAME }}_${{ env.MM_RELEASE }}_android_release.apk
+      - name: Upload Android release aab
+        if: ${{ github.event.inputs.android_release == 'true' && github.event.inputs.artifacts == 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: android_release_snapshot_aab
+          path: ./build/android/${{ env.EXPORT_NAME }}_${{ env.MM_RELEASE }}_android_release.aab
+      
   deploy_to_steam:
     name: Steam deploy 🎮
     runs-on: ubuntu-latest
