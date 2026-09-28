@@ -7,6 +7,7 @@ static var sb_normal : StyleBoxFlat
 static var sb_pressed : StyleBoxFlat
 
 func _ready() -> void:
+	set_notify_transform(true)
 	gui_input.connect(get_parent()._on_gui_input.bind(true))
 
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -25,9 +26,12 @@ func _gui_input(event : InputEvent) -> void:
 		is_pressed = event.pressed
 		queue_redraw()
 
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_THEME_CHANGED:
-		update_theme_colors()
+func _notification(what : int) -> void:
+	match what:
+		NOTIFICATION_THEME_CHANGED:
+			update_theme_colors()
+		NOTIFICATION_TRANSFORM_CHANGED:
+			update_dragger_global_pos()
 
 func update_stylebox_colors(base_color : Color, border : Color,
 		normal_opacity : float, pressed_opacity : float) -> void:
@@ -79,9 +83,9 @@ func update_theme_colors() -> void:
 		init_styleboxes()
 	var theme_path : String = mm_globals.main_window.theme.resource_path
 	if "dark" in theme_path:
-		update_stylebox_colors(Color.WHITE, Color.BLACK, .25, .8)
+		update_stylebox_colors(Color.WHITE, Color.BLACK, 0.25, 0.8)
 	elif "light" in theme_path:
-		update_stylebox_colors(Color.BLACK, Color.WHITE, .7, .25)
+		update_stylebox_colors(Color.BLACK, Color.WHITE, 0.6, 0.25)
 	elif "classic" in theme_path:
 		update_stylebox_colors(Color("506396ff"), Color("768ac2ff"), .25, .8)
 	queue_redraw()

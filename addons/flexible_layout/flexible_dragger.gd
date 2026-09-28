@@ -17,7 +17,6 @@ func _ready() -> void:
 		touch_dragger = TouchDragger.new()
 		touch_dragger.name = "TouchDragger"
 		add_child(touch_dragger)
-		set_notify_transform(true)
 		mouse_entered.disconnect($TextureRect.show)
 		mouse_exited.disconnect($TextureRect.hide)
 
@@ -77,7 +76,3 @@ func _on_gui_input(event : InputEvent, is_touch_dragger_input : bool = false):
 
 					if is_touch_dragger_input:
 						touch_dragger.update_position(new_position_x)
-
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_TRANSFORM_CHANGED and touch_dragger:
-		touch_dragger.update_dragger_global_pos.call_deferred()
