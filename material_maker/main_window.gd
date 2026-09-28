@@ -1601,8 +1601,9 @@ func android_setup_status_bar() -> void:
 	# move status bar items to menu bar
 	var status_bar_hbox : HBoxContainer =  $MainContainer/VBoxContainer/StatusBar/HBox
 	var menu_bar_hbox : HBoxContainer = $MainContainer/VBoxContainer/TopBar/Menu
-	status_bar_hbox.get_parent().remove_child(status_bar_hbox)
-	menu_bar_hbox.get_parent().add_child(status_bar_hbox)
+	status_bar_hbox.owner = null
+	status_bar_hbox.reparent(menu_bar_hbox.get_parent())
+	status_bar_hbox.owner = self
 
 	var spacer : Control = Control.new()
 	spacer.name = "StatusBarSpacer"
