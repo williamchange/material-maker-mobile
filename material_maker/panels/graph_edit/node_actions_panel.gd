@@ -26,7 +26,7 @@ func _init(graph : MMGraphEdit) -> void:
 	name = "TouchActionsPanel"
 	parent = graph
 	parent.add_child(self)
-	scale = Vector2(2, 2)
+	scale = Vector2(2.5, 2.5)
 
 func _ready() -> void:
 	hide()
