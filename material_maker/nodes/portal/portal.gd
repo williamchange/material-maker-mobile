@@ -300,7 +300,7 @@ func set_color(c : Color) -> void:
 	get_parent().send_changed_signal()
 
 func get_rect_with_link() -> Rect2:
-	var label_size : Vector2 = MMGraphPortal.LABEL_FONT.get_string_size(
+	var label_size : Vector2 = LABEL_FONT.get_string_size(
 			get_link(), HORIZONTAL_ALIGNMENT_CENTER)
 	var label_width_half = label_size.x * 0.5
 	var r : Rect2 = Rect2(Vector2.ZERO, size)
