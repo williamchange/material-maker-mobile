@@ -70,6 +70,8 @@ var is_dragging_connection : bool = false:
 
 var has_double_tap : bool = false
 
+var node_actions_panel : NodeActionsPanel
+
 signal save_path_changed
 signal graph_changed
 signal view_updated
@@ -85,6 +87,9 @@ func _ready() -> void:
 		add_valid_connection_type(t, 42)
 		add_valid_connection_type(42, t)
 	node_popup.about_to_popup.connect(func(): valid_drag_cut_entry = false)
+	
+	if OS.get_name() == "Android":
+		node_actions_panel = NodeActionsPanel.new(self)
 
 func _exit_tree():
 	remove_crash_recovery_file()
