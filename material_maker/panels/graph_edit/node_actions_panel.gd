@@ -14,16 +14,15 @@ var is_theme_updating : bool = false
 var selected_nodes : Array
 
 const BUTTON_SIZE : Vector2 = Vector2(16, 16)
-const H_PADDING : int = 16
-const AREA_PADDING : int = 24
-const PADDING : Vector2 = Vector2(
-		AREA_PADDING + H_PADDING, -AREA_PADDING)
+const H_PAD : int = 16
+const AREA_PAD : int = 24
+const PADDING : Vector2 = Vector2(AREA_PAD + H_PAD, -AREA_PAD)
 
 var container : VBoxContainer
-var buttons : Dictionary[String, Button]
+var buttons : Dictionary[String, ActionButton]
 
 func _init(graph : MMGraphEdit) -> void:
-	name = "TouchActionsPanel"
+	name = "NodeActionsPanel"
 	parent = graph
 	parent.add_child(self)
 	scale = Vector2(2.5, 2.5)
@@ -34,8 +33,8 @@ func _ready() -> void:
 	setup_signals()
 
 	container = VBoxContainer.new()
-	create_buttons()
 	add_child(container)
+	create_buttons()
 
 	theme_type_variation = "MM_PanelMenuSubPanel"
 
@@ -55,32 +54,34 @@ func setup_signals() -> void:
 	parent.draw.connect(draw_selection_area)
 
 func create_buttons() -> void:
-	buttons.close = add_button(parent.remove_selection)
-	buttons.minimize = add_button(parent.minimize_selection)
-	buttons.randomize = add_button(parent._on_button_reroll_pressed)
-
-	container.add_child(buttons.close)
-	container.add_child(buttons.minimize)
-	container.add_child(buttons.randomize)
+	buttons.close = create_button(parent.remove_selection)
+	buttons.minimize = create_button(parent.minimize_selection)
+	buttons.randomize = create_button()
+	buttons.generic = create_button()
+	buttons.custom = create_button()
 
 func update_button_icons() -> void:
 	buttons.close.icon = get_theme_icon("delete_2x", "MM_Icons")
 	buttons.minimize.icon = get_theme_icon("minimize", "MM_Icons")
 	buttons.randomize.icon = get_theme_icon("randomize", "MM_Icons")
+	buttons.generic.icon = get_theme_icon("generic_size", "MM_Icons")
+	buttons.custom.icon = get_theme_icon("draw_2x", "MM_Icons")
 
-func add_button(callback : Callable = Callable()) -> Button:
-	var button = Button.new()
+	buttons.randomize.add_theme_color_override("icon_normal_color", Color.WHITE)
+
+func create_button(pressed_callback : Callable = Callable()) -> ActionButton:
+	var button : ActionButton = ActionButton.new()
 	button.custom_minimum_size = BUTTON_SIZE
 	button.flat = true
 	button.expand_icon = true
-	button.pressed.connect(callback)
+	if pressed_callback != Callable():
+		button.pressed.connect(pressed_callback)
+	container.add_child(button)
 	return button
 
 func init_stylebox() -> void:
 	if not sb_selection:
 		sb_selection = StyleBoxFlat.new()
-		sb_selection.bg_color = Color(0.207, 0.207, 0.207, 1.0)
-		sb_selection.border_color = Color(0.376, 0.376, 0.376, 1.0)
 		sb_selection.set_border_width_all(2)
 		sb_selection.set_corner_radius_all(4)
 		sb_selection.corner_detail = 4
@@ -102,21 +103,24 @@ func update_stylebox() -> void:
 func draw_selection_area() -> void:
 	if selection_area.size != Vector2.ZERO and sb_selection and visible:
 		var ci : RID = parent.get_canvas_item()
-		sb_selection.draw(ci, selection_area.grow(AREA_PADDING))
+		sb_selection.draw(ci, selection_area.grow(AREA_PAD))
 
-func update_selection() -> void:
+func create_panel() -> void:
 	if not is_node_ready():
 		return
 	while Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		if Input.is_key_pressed(KEY_SHIFT):
+			hide()
 		await get_tree().process_frame
+	await get_tree().process_frame
 
 	selected_nodes = parent.get_selected_nodes()
 	if selected_nodes.is_empty():
 		hide_panel()
 		return
 
-	for key : String in buttons:
-		buttons[key].show()
+	for b : ActionButton in container.get_children():
+		b.show()
 
 	var nodes_rect : Rect2 = Rect2(0, 0, -1, -1)
 	for n in selected_nodes:
@@ -132,26 +136,39 @@ func update_selection() -> void:
 
 	if selected_nodes.size() == 1:
 		selection_area = Rect2()
-		position.x += AREA_PADDING
+		position.x += AREA_PAD
 
 		var node : MMGraphNodeMinimal = selected_nodes[0]
+		var gen : MMGenBase = node.generator
+
 		if node.get_script() in [ MMGraphPortal, MMGraphReroute ]:
 			buttons.minimize.hide()
 			buttons.randomize.hide()
+			buttons.generic.hide()
+			buttons.custom.hide()
+
 			position = node.position
-			position.x += node.size.x * 0.5 * parent.zoom - size.x
-			position.y += (node.size.y + H_PADDING) * parent.zoom
+			position.x += node.size.x * 0.5 * parent.zoom - size.x - 6
+			position.y += (node.size.y + H_PAD) * parent.zoom
 		else:
-			var gen : MMGenBase = node.generator
-			buttons.close.visible = gen.can_be_deleted()
-			buttons.randomize.visible = gen.has_randomness()
+			buttons.close.visible = should_close_visible(gen)
+			buttons.randomize.visible = should_random_visible(gen)
+			buttons.generic.visible = should_generic_visible(gen)
+			buttons.custom.visible = should_custom_visible(gen)
+
+			buttons.randomize.connect_actions(node.on_randomness_pressed, node.randomness_button_create_popup)
+			buttons.generic.connect_actions(node.on_generic_pressed, node.generic_button_create_popup)
+			buttons.custom.connect_actions(node.edit_generator, node.custom_button_create_popup)
 	elif selected_nodes.size() > 1:
 		selection_area = nodes_rect
 		position += PADDING
 
 		buttons.close.visible = node_selection_can_be_deleted()
 		buttons.randomize.visible = node_selection_has_randomness()
-		buttons.minimize.show()
+		buttons.generic.visible = false
+		buttons.custom.visible = false
+
+		buttons.randomize.connect_actions(randomize_selected_nodes)
 
 	size = Vector2.ZERO
 	show_panel()
@@ -172,7 +189,7 @@ func should_update_selection() -> void:
 	if is_updating:
 		return
 	is_updating = true
-	update_selection.call_deferred()
+	create_panel.call_deferred()
 
 func calc_node_rect(n : GraphElement) -> Rect2:
 	if n is MMGraphPortal:
@@ -181,16 +198,63 @@ func calc_node_rect(n : GraphElement) -> Rect2:
 				r.size * parent.zoom)
 	return Rect2(n.position, n.size * parent.zoom)
 
+#region generator conditionals
+
+func node_selection_has_generic() -> bool:
+	for node in selected_nodes:
+		return should_generic_visible(node.generator)
+	return false
+
 func node_selection_has_randomness() -> bool:
 	for node in selected_nodes:
-		var g : MMGenBase = node.generator
-		if g and g.has_randomness():
-			return true
+		return should_random_visible(node.generator)
 	return false
 
 func node_selection_can_be_deleted() -> bool:
 	for node in selected_nodes:
-		var g : MMGenBase = node.generator
-		if g and g.can_be_deleted():
-			return true
+		return should_close_visible(node.generator)
 	return false
+
+func randomize_selected_nodes() -> void:
+	parent.undoredo.start_group()
+	for node in selected_nodes:
+		if should_random_visible(node.generator):
+			node.on_randomness_pressed()
+	parent.undoredo.end_group()
+
+func should_close_visible(g : MMGenBase) -> bool:
+	return g and g.can_be_deleted()
+
+func should_random_visible(g : MMGenBase) -> bool:
+	return g and g.has_randomness()
+
+func should_generic_visible(g : MMGenBase) -> bool:
+	return g and g.has_method("is_generic") and g.is_generic()
+
+func should_custom_visible(g : MMGenBase) -> bool:
+	return g and g.model == null and (g is MMGenShader or g is MMGenGraph)
+
+#endregion
+
+class ActionButton extends Button:
+	signal on_show_popup
+
+	func _gui_input(event : InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed:
+			if event.button_index == MOUSE_BUTTON_RIGHT:
+				on_show_popup.emit()
+
+	func disconnect_actions() -> void:
+		for s in [ pressed, on_show_popup ]:
+			for connection in s.get_connections():
+				if s.is_connected(connection.callable):
+					s.disconnect(connection.callable)
+
+	func connect_actions(pressed_callback : Callable = Callable(),
+			popup_callback : Callable = Callable()) -> void:
+		disconnect_actions()
+		if visible:
+			if pressed_callback != Callable() and not pressed.is_connected(pressed_callback):
+				pressed.connect(pressed_callback)
+			if  popup_callback != Callable() and not on_show_popup.is_connected(popup_callback):
+				on_show_popup.connect(popup_callback)
