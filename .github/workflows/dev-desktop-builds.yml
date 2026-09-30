@@ -59,10 +59,8 @@ jobs:
         with:
           name: android_debug_snapshot
           path: ./build/android/${{ env.EXPORT_NAME }}_${{ env.MM_RELEASE }}_android_debug.apk
-          archive: false
       - name: Upload Android release apk
         uses: actions/upload-artifact@v7
         with:
           name: android_release_snapshot
           path: ./build/android/${{ env.EXPORT_NAME }}_${{ env.MM_RELEASE }}_android_release.apk
-          archive: false
