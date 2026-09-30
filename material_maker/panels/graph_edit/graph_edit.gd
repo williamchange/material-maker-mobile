@@ -156,12 +156,6 @@ func _input(event : InputEvent) -> void:
 				if is_dragging_connection:
 					force_connection_drag_end()
 				accept_event()
-			elif event is InputEventScreenTouch:
-				has_double_tap = event.double_tap
-			elif event is InputEventMagnifyGesture and has_double_tap:
-				# prevents double-tap drag zoom from activating
-				# as it easily interferes with two-finger magnify
-				accept_event()
 
 	# Handle node grab
 	if has_grab:
