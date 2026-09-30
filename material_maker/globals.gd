@@ -75,8 +75,13 @@ const DEFAULT_CONFIG : Dictionary = {
 func _enter_tree():
 	config.load("user://mm_config.ini")
 	for k : String in DEFAULT_CONFIG.keys():
-		if ! config.has_section_key("config", k):
+		if not config.has_section_key("config", k):
 			config.set_value("config", k, DEFAULT_CONFIG[k])
+
+			# android-specific defaults
+			if OS.get_name() == "Android":
+				if k in ["node_minimize_button", "node_close_button"]:
+					config.set_value("config", k, false)
 
 func _exit_tree():
 	config.save("user://mm_config.ini")
