@@ -4,7 +4,6 @@ extends Node
 ## basic touch handling and android utilities
 
 var active_touch : int = -1
-var active_touch_drag : int = -1
 
 var touch_info : Dictionary[int, Vector2] = {}
 
@@ -39,7 +38,6 @@ var time_since_touch_down : int = -1:
 func _input(event : InputEvent) -> void:
 	if event is InputEventScreenDrag:
 		touch_info[event.index] = event.position
-		active_touch_drag = event.index
 	elif event is InputEventScreenTouch:
 		if event.pressed:
 			_touch_start = Time.get_ticks_msec()
