@@ -111,10 +111,11 @@ func create_panel() -> void:
 		selection_area = Rect2()
 		position.x += AREA_PAD
 
-		var node : MMGraphNodeMinimal = selected_nodes[0]
+		var node : GraphElement = selected_nodes[0]
 		var gen : MMGenBase = node.generator
 
-		if node.get_script() in [ MMGraphPortal, MMGraphReroute ]:
+		if node.get_script() in [ MMGraphPortal, MMGraphReroute,
+				MMGraphCommentLine, MMGraphDebug ]:
 			buttons.minimize.hide()
 			buttons.randomize.hide()
 			buttons.generic.hide()
