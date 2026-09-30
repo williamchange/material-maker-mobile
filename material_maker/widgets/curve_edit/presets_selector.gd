@@ -1,0 +1,35 @@
+extends MenuButton
+
+var MP = MMCurve.Point
+
+var presets : Array[Dictionary] = [
+	{ name="Linear", curve=[MP.new(0.0, 0.0, 0.0, 1.0), MP.new(1.0, 1.0, 1.0, 0.0)] },
+	{ name="EaseOut", curve=[MP.new(0.0, 0.0, 0.0, 4.0), MP.new(0.292893, 0.707107, 1.0, 1.0), MP.new(1.0, 1.0, 0.0, 0.0)] },
+	{ name="EaseInOut", curve=[MP.new(0.0, 0.0, 0.0, 0.0), MP.new(0.5, 0.5, 3.0, 3.0), MP.new(1.0, 1.0, 0.0, 0.0)] },
+	{ name="EaseIn", curve=[MP.new(0.0, 0.0, 0.0, 0.0), MP.new(0.707107, 0.292893, 1.0, 1.0), MP.new(1.0, 1.0, 4.0, 0.0)] },
+	{ name="SawTooth", curve=[MP.new(0.0, 0.0, 0.0, 2.0), MP.new(0.5, 1.0, 2.0, -2.0), MP.new(1.0, 0.0, -2.0, 0.0)] },
+	{ name="Bounce", curve=[MP.new(0.0, 0.0, 0.0, 5.0), MP.new(0.15, 0.65, 2.45201, 2.45201), MP.new(0.5, 1.0, 0.0, 0.0), MP.new(0.85, 0.65, -2.45201, -2.45201), MP.new(1.0, 0.0, -5.0, 0.0)] },
+	{ name="Bevel", curve=[MP.new(0.0, 0.0, 0.0, 6.553708), MP.new(0.117274, 0.774309, 6.784962, 0.250337), MP.new(1.0, 1.0,  0.256162, 0.0)] }
+] 
+
+func _enter_tree() -> void:
+	get_popup().id_pressed.connect(_menu_item_selected)
+
+func _exit_tree() -> void:
+	get_popup().id_pressed.disconnect(_menu_item_selected)
+
+func _notification(what : int) -> void:
+	match what:
+		NOTIFICATION_THEME_CHANGED:
+			var popup : PopupMenu = get_popup()
+			popup.clear()
+			for p in presets:
+				var icon_name : String = p.name.to_lower()
+				popup.add_icon_item(get_theme_icon(icon_name, "MM_CurveIcons"), p.name)
+			
+
+func _menu_item_selected(index : int) -> void:
+	var curve = MMCurve.new()
+	curve.points = presets[index].curve
+	get_parent().get_parent().get_node("EditorContainer/CurveEditor").set_curve(curve)
+	get_parent().get_parent().get_node("ControlUIContainer/ControlUI").hide()

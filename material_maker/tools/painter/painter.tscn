@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://d12t30rjvol15"]
+
+[ext_resource type="Script" path="res://material_maker/tools/painter/painter.gd" id="6"]
+
+[node name="Painter" type="Node" groups=["preview"]]
+script = ExtResource("6")

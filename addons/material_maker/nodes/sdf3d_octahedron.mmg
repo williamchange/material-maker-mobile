@@ -1,0 +1,62 @@
+{
+	"name": "sdf3d_octahedron",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"r": 0.4
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": "",
+		"global": [
+			"// The MIT License, Copyright © 2019 Inigo Quilez",
+			"// https://www.shadertoy.com/view/wsSGDG",
+			"float sdOctahedron(vec3 p, float s) {",
+			"\tp = abs(p);",
+			"\tfloat m = p.x + p.y + p.z - s;",
+			"\tvec3 r = 3.0*p - m;",
+			"\tvec3 q;",
+			"\t\t if( r.x < 0.0 ) q = p.xyz;",
+			"\telse if( r.y < 0.0 ) q = p.yzx;",
+			"\telse if( r.z < 0.0 ) q = p.zxy;",
+			"\telse return m*0.57735027;",
+			"\tfloat k = clamp(0.5*(q.z-q.y+s),0.0,s); ",
+			"\treturn length(vec3(q.x,q.y-s+k,q.z-k)); ",
+			"}",
+			"",
+			""
+		],
+		"inputs": [
+
+		],
+		"instance": "",
+		"longdesc": "Generates an octahedron as a signed distance function",
+		"name": "Octahedron",
+		"outputs": [
+			{
+				"longdesc": "Shows the sphere",
+				"sdf3d": "sdOctahedron($uv, $r)",
+				"shortdesc": "Output",
+				"type": "sdf3d"
+			}
+		],
+		"parameters": [
+			{
+				"control": "Radius1.r",
+				"default": 0.5,
+				"label": "Radius",
+				"longdesc": "The size of the octahedron",
+				"max": 1,
+				"min": 0,
+				"name": "r",
+				"shortdesc": "Size",
+				"step": 0.01,
+				"type": "float"
+			}
+		],
+		"shortdesc": "Octahedron"
+	},
+	"type": "shader"
+}

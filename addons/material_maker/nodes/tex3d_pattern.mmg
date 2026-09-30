@@ -1,0 +1,239 @@
+{
+	"name": "tex3d_pattern",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"mix": 0,
+		"x_scale": 2,
+		"x_wave": 0,
+		"y_scale": 2,
+		"y_wave": 0,
+		"z_scale": 2,
+		"z_wave": 0
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": "",
+		"global": [
+			"float mix3d_mul(float x, float y, float z) {",
+			"\treturn x*y*z;",
+			"}",
+			"",
+			"float mix3d_add(float x, float y, float z) {",
+			"\treturn min(x+y+z, 1.0);",
+			"}",
+			"",
+			"float mix3d_max(float x, float y, float z) {",
+			"\treturn max(max(x, y), z);",
+			"}",
+			"",
+			"float mix3d_min(float x, float y, float z) {",
+			"\treturn min(min(x, y), z);",
+			"}",
+			"",
+			"float mix3d_xor(float x, float y, float z) {",
+			"\tfloat xy = min(x+y, 2.0-x-y);",
+			"\treturn min(xy+z, 2.0-xy-z);",
+			"}",
+			"",
+			"float mix3d_pow(float x, float y, float z) {",
+			"\treturn pow(pow(x, y), z);",
+			"}"
+		],
+		"includes": [
+			"pattern"
+		],
+		"inputs": [
+
+		],
+		"instance": "",
+		"longdesc": "A grayscale 3D texture that combines patterns along all 3 axes",
+		"name": "TEX3D Pattern",
+		"outputs": [
+			{
+				"longdesc": "The generated 3D texture",
+				"shortdesc": "Output",
+				"tex3d_gs": "mix3d_$(mix)(wave_$(x_wave)($(x_scale)*$uv.x), wave_$(y_wave)($(y_scale)*$uv.y), wave_$(z_wave)($(z_scale)*$uv.z))",
+				"type": "tex3d_gs"
+			}
+		],
+		"parameters": [
+			{
+				"default": 0,
+				"label": "Combiner",
+				"longdesc": "The operation used to combine the X, Y and Z patterns",
+				"name": "mix",
+				"shortdesc": "Combine",
+				"type": "enum",
+				"values": [
+					{
+						"name": "Multiply",
+						"value": "mul"
+					},
+					{
+						"name": "Add",
+						"value": "add"
+					},
+					{
+						"name": "Max",
+						"value": "max"
+					},
+					{
+						"name": "Min",
+						"value": "min"
+					},
+					{
+						"name": "Xor",
+						"value": "xor"
+					},
+					{
+						"name": "Pow",
+						"value": "pow"
+					}
+				]
+			},
+			{
+				"default": 0,
+				"label": "X",
+				"longdesc": "Pattern generated along the X axis",
+				"name": "x_wave",
+				"shortdesc": "Pattern.x",
+				"type": "enum",
+				"values": [
+					{
+						"name": "Sine",
+						"value": "sine"
+					},
+					{
+						"name": "Triangle",
+						"value": "triangle"
+					},
+					{
+						"name": "Square",
+						"value": "square"
+					},
+					{
+						"name": "Sawtooth",
+						"value": "sawtooth"
+					},
+					{
+						"name": "Constant",
+						"value": "constant"
+					},
+					{
+						"name": "Bounce",
+						"value": "bounce"
+					}
+				]
+			},
+			{
+				"control": "None",
+				"default": 4,
+				"label": "2:",
+				"longdesc": "Repetitions of the pattern along X axis",
+				"max": 32,
+				"min": 0,
+				"name": "x_scale",
+				"shortdesc": "Repeat.x",
+				"step": 1,
+				"type": "float"
+			},
+			{
+				"default": 0,
+				"label": "Y",
+				"longdesc": "Pattern generated along the Y axis",
+				"name": "y_wave",
+				"shortdesc": "Pattern.y",
+				"type": "enum",
+				"values": [
+					{
+						"name": "Sine",
+						"value": "sine"
+					},
+					{
+						"name": "Triangle",
+						"value": "triangle"
+					},
+					{
+						"name": "Square",
+						"value": "square"
+					},
+					{
+						"name": "Sawtooth",
+						"value": "sawtooth"
+					},
+					{
+						"name": "Constant",
+						"value": "constant"
+					},
+					{
+						"name": "Bounce",
+						"value": "bounce"
+					}
+				]
+			},
+			{
+				"control": "None",
+				"default": 4,
+				"label": "3:",
+				"longdesc": "Repetitions of the pattern along Y axis",
+				"max": 32,
+				"min": 0,
+				"name": "y_scale",
+				"shortdesc": "Repeat.y",
+				"step": 1,
+				"type": "float"
+			},
+			{
+				"default": 0,
+				"label": "Z",
+				"longdesc": "Pattern generated along the Z axis",
+				"name": "z_wave",
+				"shortdesc": "Pattern.z",
+				"type": "enum",
+				"values": [
+					{
+						"name": "Sine",
+						"value": "sine"
+					},
+					{
+						"name": "Triangle",
+						"value": "triangle"
+					},
+					{
+						"name": "Square",
+						"value": "square"
+					},
+					{
+						"name": "Sawtooth",
+						"value": "sawtooth"
+					},
+					{
+						"name": "Constant",
+						"value": "constant"
+					},
+					{
+						"name": "Bounce",
+						"value": "bounce"
+					}
+				]
+			},
+			{
+				"control": "None",
+				"default": 4,
+				"label": "4:",
+				"longdesc": "Repetitions of the pattern along Z axis",
+				"max": 32,
+				"min": 0,
+				"name": "z_scale",
+				"shortdesc": "Repeat.z",
+				"step": 1,
+				"type": "float"
+			}
+		],
+		"shortdesc": "Tex3D Pattern"
+	},
+	"type": "shader"
+}

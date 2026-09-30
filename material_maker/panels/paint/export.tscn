@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ftx52hy53io2"]
+
+[ext_resource type="Script" path="res://material_maker/panels/paint/export.gd" id="1"]
+
+[node name="Export" type="Node"]
+script = ExtResource("1")

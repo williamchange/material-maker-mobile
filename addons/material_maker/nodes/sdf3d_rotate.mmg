@@ -1,0 +1,102 @@
+{
+	"generic_size": 1,
+	"name": "sdf3d_rotate",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"ax": 0,
+		"ay": 0,
+		"az": 0
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": "",
+		"global": [
+			"vec3 rotate3d(vec3 p, vec3 a) {",
+			"\tvec3 rv;",
+			"\tfloat c;",
+			"\tfloat s;",
+			"\tc = cos(a.x);",
+			"\ts = sin(a.x);",
+			"\trv.x = p.x;",
+			"\trv.y = p.y*c+p.z*s;",
+			"\trv.z = -p.y*s+p.z*c;",
+			"\tc = cos(a.y);",
+			"\ts = sin(a.y);",
+			"\tp.x = rv.x*c+rv.z*s;",
+			"\tp.y = rv.y;",
+			"\tp.z = -rv.x*s+rv.z*c;",
+			"\tc = cos(a.z);",
+			"\ts = sin(a.z);",
+			"\trv.x = p.x*c+p.y*s;",
+			"\trv.y = -p.x*s+p.y*c;",
+			"\trv.z = p.z;",
+			"\treturn rv;",
+			"}",
+			""
+		],
+		"inputs": [
+			{
+				"default": "vec2(100.0, 0.0)",
+				"label": "",
+				"longdesc": "The input object as signed distance function",
+				"name": "in#",
+				"shortdesc": "Input#",
+				"type": "sdf3dc"
+			}
+		],
+		"instance": "",
+		"longdesc": "Rotates its input 3D object described as a signed distance function.",
+		"name": "Rotate",
+		"outputs": [
+			{
+				"longdesc": "The rotated object",
+				"sdf3dc": "$in#(rotate3d($uv, -vec3($ax, $ay, $az)*0.01745329251))",
+				"shortdesc": "Output#",
+				"type": "sdf3dc"
+			}
+		],
+		"parameters": [
+			{
+				"control": "None",
+				"default": 0,
+				"label": "X",
+				"longdesc": "The rotation around the X axis",
+				"max": 180,
+				"min": -180,
+				"name": "ax",
+				"shortdesc": "Rotate.x",
+				"step": 1,
+				"type": "float"
+			},
+			{
+				"control": "None",
+				"default": 0,
+				"label": "Y",
+				"longdesc": "The rotation around the Y axis",
+				"max": 180,
+				"min": -180,
+				"name": "ay",
+				"shortdesc": "Rotate.y",
+				"step": 1,
+				"type": "float"
+			},
+			{
+				"control": "None",
+				"default": 0,
+				"label": "Z",
+				"longdesc": "The rotation around the Z axis",
+				"max": 180,
+				"min": -180,
+				"name": "az",
+				"shortdesc": "Rotate.z",
+				"step": 1,
+				"type": "float"
+			}
+		],
+		"shortdesc": "Rotate"
+	},
+	"type": "shader"
+}

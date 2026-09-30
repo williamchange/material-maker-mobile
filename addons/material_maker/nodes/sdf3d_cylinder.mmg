@@ -1,0 +1,87 @@
+{
+	"name": "sdf3d_cylinder",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"axis": 1,
+		"l": 0.25,
+		"r": 0.25
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": "",
+		"global": [
+			"float sdCylinder(vec3 p, float h, float r) {",
+			"\tvec2 d = abs(vec2(length(p.xz), p.y)) - vec2(r, h);",
+			"\treturn min(max(d.x, d.y),0.0) + length(max(d, 0.0));",
+			"}",
+			""
+		],
+		"inputs": [
+
+		],
+		"instance": "",
+		"longdesc": "Generates a cylinder as a signed distance function",
+		"name": "Cylinder",
+		"outputs": [
+			{
+				"longdesc": "Shows the cylinder",
+				"sdf3d": "sdCylinder($uv$axis, $l, $r)",
+				"shortdesc": "Output",
+				"type": "sdf3d"
+			}
+		],
+		"parameters": [
+			{
+				"default": 2,
+				"label": "Axis",
+				"longdesc": "The axis of the cylinder",
+				"name": "axis",
+				"shortdesc": "Axis",
+				"type": "enum",
+				"values": [
+					{
+						"name": "X",
+						"value": ".yxz"
+					},
+					{
+						"name": "Y",
+						"value": ""
+					},
+					{
+						"name": "Z",
+						"value": ".xzy"
+					}
+				]
+			},
+			{
+				"control": "Rect1.y",
+				"default": 0.5,
+				"label": "Length",
+				"longdesc": "The length of the cylinder",
+				"max": 1,
+				"min": 0,
+				"name": "l",
+				"shortdesc": "Length",
+				"step": 0.01,
+				"type": "float"
+			},
+			{
+				"control": "Rect1.x",
+				"default": 0.2,
+				"label": "Radius",
+				"longdesc": "The radius of the cylinder",
+				"max": 1,
+				"min": 0,
+				"name": "r",
+				"shortdesc": "Radius",
+				"step": 0.01,
+				"type": "float"
+			}
+		],
+		"shortdesc": "Cylinder"
+	},
+	"type": "shader"
+}

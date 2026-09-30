@@ -1,0 +1,75 @@
+extends Window
+
+var object : Object = null
+var method : String
+var extra_parameters : Array = []
+var accept_empty : bool = false
+
+@onready var editor = $MarginContainer/VBoxContainer/TextEdit
+@onready var parser = load("res://addons/material_maker/parser/glsl_parser.gd").new()
+
+func _ready():
+	content_scale_factor = mm_globals.ui_scale_factor()
+	min_size = Vector2(300, 100) * content_scale_factor
+
+
+func edit_parameter(wt : String, value : String, o : Object, m : String, ep : Array = [], ae : bool = false):
+	object = o
+	method = m
+	extra_parameters = ep
+	accept_empty = ae
+	title = wt
+	editor.text = value
+	hide()
+	popup_centered()
+	editor.set_caret_column(editor.text.length())
+	editor.grab_focus()
+
+func check_self_reference_apply() -> bool:
+	var value : String = editor.text.replace("\n", "").strip_edges()
+	var self_reference := RegEx.new()
+	self_reference.compile("\\$\\b%s\\b" % object.name)
+	# warns if result expression causes variable to reference itself
+	if self_reference.search(value):
+		var dialog : AcceptDialog = load("res://material_maker/windows/accept_dialog/accept_dialog.tscn").instantiate()
+		var error_text := tr("Expression creates a loop. Remove $%s then try again." % object.name)
+		dialog.dialog_text = TranslationServer.translate(error_text)
+		add_child(dialog)
+		await dialog.ask()
+		return false 
+	var parameters : Array = [ value ]
+	parameters.append_array(extra_parameters)
+	object.callv(method, parameters)
+	return true
+
+func _on_Apply_pressed():
+	if not await check_self_reference_apply():
+		return
+
+func _on_OK_pressed():
+	if not await check_self_reference_apply():
+		return
+	queue_free()
+
+func _on_Cancel_pressed():
+	queue_free()
+
+func _on_TextEdit_gui_input(event):
+	if event is InputEventKey and event.pressed:
+		match event.keycode:
+			KEY_ENTER:
+				_on_OK_pressed()
+			KEY_ESCAPE:
+				_on_Cancel_pressed()
+			_:
+				if accept_empty and editor.text == "":
+					$MarginContainer/VBoxContainer/HBoxContainer/OK.disabled = false
+					$MarginContainer/VBoxContainer/HBoxContainer/Apply.disabled = false
+				else:
+					var parse_result = parser.parse(editor.text)
+					if parse_result.status == "OK" and parse_result.non_terminal == "expression":
+						$MarginContainer/VBoxContainer/HBoxContainer/OK.disabled = false
+						$MarginContainer/VBoxContainer/HBoxContainer/Apply.disabled = false
+					else:
+						$MarginContainer/VBoxContainer/HBoxContainer/OK.disabled = true
+						$MarginContainer/VBoxContainer/HBoxContainer/Apply.disabled = true

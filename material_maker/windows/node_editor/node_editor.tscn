@@ -1,0 +1,219 @@
+[gd_scene load_steps=9 format=3 uid="uid://cbpg2wtvf7fc1"]
+
+[ext_resource type="Script" uid="uid://ce61t4udbuwna" path="res://material_maker/windows/node_editor/node_editor.gd" id="1"]
+[ext_resource type="Script" uid="uid://c53hfh1qg7i8o" path="res://material_maker/windows/node_editor/node_editor_item_list.gd" id="2"]
+[ext_resource type="Texture2D" uid="uid://c0j4px4n72di5" path="res://material_maker/icons/icons.tres" id="3"]
+[ext_resource type="PackedScene" uid="uid://buj231c2gxm4o" path="res://material_maker/widgets/desc_button/desc_button.tscn" id="4"]
+[ext_resource type="PackedScene" uid="uid://ddgb7ul6fncx8" path="res://material_maker/widgets/code_editor/code_editor.tscn" id="5_l5uxq"]
+
+[sub_resource type="AtlasTexture" id="1"]
+atlas = ExtResource("3")
+region = Rect2(48, 0, 16, 16)
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_g2tsy"]
+number_color = Color(0.341176, 0.352941, 1, 1)
+symbol_color = Color(0.768627, 0.776471, 0, 1)
+function_color = Color(0.792157, 0, 0.796078, 1)
+member_variable_color = Color(0, 0.639216, 0.635294, 1)
+
+[sub_resource type="CodeHighlighter" id="CodeHighlighter_062tj"]
+number_color = Color(0.341176, 0.352941, 1, 1)
+symbol_color = Color(0.768627, 0.776471, 0, 1)
+function_color = Color(0.792157, 0, 0.796078, 1)
+member_variable_color = Color(0, 0.639216, 0.635294, 1)
+
+[node name="NodeEditor" type="Window"]
+oversampling_override = 1.0
+title = "Node Editor"
+initial_position = 2
+size = Vector2i(950, 450)
+exclusive = true
+script = ExtResource("1")
+
+[node name="BG" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.043137256, 0.043137256, 0.047058824, 1)
+
+[node name="Sizer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TopSpacer" type="Control" parent="Sizer"]
+custom_minimum_size = Vector2(0, 3)
+layout_mode = 2
+
+[node name="TabBar" type="TabContainer" parent="Sizer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+current_tab = 0
+
+[node name="General" type="VBoxContainer" parent="Sizer/TabBar"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Name" type="HBoxContainer" parent="Sizer/TabBar/General"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LabelName" type="Label" parent="Sizer/TabBar/General/Name"]
+layout_mode = 2
+text = "Name:"
+
+[node name="Name" type="LineEdit" parent="Sizer/TabBar/General/Name"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+
+[node name="Description" parent="Sizer/TabBar/General/Name" instance=ExtResource("4")]
+layout_mode = 2
+description_type = "Node"
+
+[node name="LabelParameters" type="Label" parent="Sizer/TabBar/General"]
+layout_mode = 2
+text = "Parameters:"
+
+[node name="Parameters" type="ScrollContainer" parent="Sizer/TabBar/General"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Sizer" type="VBoxContainer" parent="Sizer/TabBar/General/Parameters"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2")
+
+[node name="AddParameter" type="Button" parent="Sizer/TabBar/General/Parameters/Sizer"]
+layout_mode = 2
+size_flags_horizontal = 0
+icon = SubResource("1")
+flat = true
+
+[node name="LabelInputs" type="Label" parent="Sizer/TabBar/General"]
+layout_mode = 2
+text = "Inputs:"
+
+[node name="Inputs" type="ScrollContainer" parent="Sizer/TabBar/General"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Sizer" type="VBoxContainer" parent="Sizer/TabBar/General/Inputs"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2")
+
+[node name="AddInput" type="Button" parent="Sizer/TabBar/General/Inputs/Sizer"]
+layout_mode = 2
+size_flags_horizontal = 0
+icon = SubResource("1")
+flat = true
+
+[node name="Outputs" type="VBoxContainer" parent="Sizer/TabBar"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="LabelOutputs" type="Label" parent="Sizer/TabBar/Outputs"]
+layout_mode = 2
+text = "Outputs:"
+
+[node name="Outputs" type="ScrollContainer" parent="Sizer/TabBar/Outputs"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Sizer" type="VBoxContainer" parent="Sizer/TabBar/Outputs/Outputs"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("2")
+
+[node name="AddOutput" type="Button" parent="Sizer/TabBar/Outputs/Outputs/Sizer"]
+layout_mode = 2
+size_flags_horizontal = 0
+icon = SubResource("1")
+flat = true
+
+[node name="Main Code" parent="Sizer/TabBar" instance=ExtResource("5_l5uxq")]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Instance Functions" parent="Sizer/TabBar" instance=ExtResource("5_l5uxq")]
+visible = false
+layout_mode = 2
+syntax_highlighter = SubResource("CodeHighlighter_g2tsy")
+metadata/_tab_index = 3
+
+[node name="Global Functions" type="VBoxContainer" parent="Sizer/TabBar"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 4
+
+[node name="Includes" type="HBoxContainer" parent="Sizer/TabBar/Global Functions"]
+layout_mode = 2
+
+[node name="LabelIncludes" type="Label" parent="Sizer/TabBar/Global Functions/Includes"]
+layout_mode = 2
+text = "Includes:"
+
+[node name="Includes" type="LineEdit" parent="Sizer/TabBar/Global Functions/Includes"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Functions" parent="Sizer/TabBar/Global Functions" instance=ExtResource("5_l5uxq")]
+layout_mode = 2
+size_flags_vertical = 3
+syntax_highlighter = SubResource("CodeHighlighter_062tj")
+
+[node name="ErrorLabel" type="Label" parent="Sizer/TabBar/Global Functions/Functions"]
+visible = false
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 2.0
+offset_top = -17.0
+offset_right = -2.0
+offset_bottom = 6.0
+clip_text = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Sizer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Apply" type="Button" parent="Sizer/HBoxContainer"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "Apply"
+
+[node name="OK" type="Button" parent="Sizer/HBoxContainer"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "OK"
+
+[node name="Cancel" type="Button" parent="Sizer/HBoxContainer"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+text = "Cancel"
+
+[node name="BottomSpacer" type="Control" parent="Sizer"]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+
+[connection signal="close_requested" from="." to="." method="_on_Cancel_pressed"]
+[connection signal="ready" from="." to="." method="_on_ready"]
+[connection signal="minimum_size_changed" from="Sizer" to="." method="_on_Sizer_minimum_size_changed"]
+[connection signal="pressed" from="Sizer/TabBar/General/Parameters/Sizer/AddParameter" to="." method="_on_AddParameter_pressed"]
+[connection signal="pressed" from="Sizer/TabBar/General/Inputs/Sizer/AddInput" to="." method="_on_AddInput_pressed"]
+[connection signal="pressed" from="Sizer/TabBar/Outputs/Outputs/Sizer/AddOutput" to="." method="_on_AddOutput_pressed"]
+[connection signal="text_changed" from="Sizer/TabBar/Global Functions/Functions" to="." method="_on_Functions_text_changed"]
+[connection signal="pressed" from="Sizer/HBoxContainer/Apply" to="." method="_on_Apply_pressed"]
+[connection signal="pressed" from="Sizer/HBoxContainer/OK" to="." method="_on_OK_pressed"]
+[connection signal="pressed" from="Sizer/HBoxContainer/Cancel" to="." method="_on_Cancel_pressed"]

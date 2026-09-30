@@ -1,0 +1,98 @@
+{
+	"name": "radial_gradient",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"gradient": {
+			"interpolation": 1,
+			"points": [
+				{
+					"a": 1.0,
+					"b": 0.0,
+					"g": 0.0,
+					"pos": 0.0,
+					"r": 0.0
+				},
+				{
+					"a": 1.0,
+					"b": 1.0,
+					"g": 1.0,
+					"pos": 1.0,
+					"r": 1.0
+				}
+			],
+			"type": "Gradient"
+		},
+		"mirror": false,
+		"repeat": 1.0
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": "",
+		"global": "",
+		"inputs": [],
+		"instance": "",
+		"name": "Radial Gradient",
+		"outputs": [
+			{
+				"longdesc": "An image showing the gradient",
+				"rgba": "$gradient($mirror ? 2.0*(0.5-abs(fract(1.41421356237*length(fract($uv)-vec2(0.5, 0.5))*$repeat)-0.5)) : fract($repeat*1.41421356237*length(fract($uv)-vec2(0.5, 0.5))) )",
+				"shortdesc": "Output",
+				"type": "rgba"
+			}
+		],
+		"parameters": [
+			{
+				"control": "None",
+				"default": 1.0,
+				"label": "Repeat",
+				"longdesc": "Number of repetitions of the gradient",
+				"max": 32.0,
+				"min": 1.0,
+				"name": "repeat",
+				"shortdesc": "Repeat",
+				"step": 1.0,
+				"type": "float"
+			},
+			{
+				"default": false,
+				"label": "Mirror",
+				"longdesc": "Mirrors the gradient",
+				"name": "mirror",
+				"shortdesc": "Mirror",
+				"type": "boolean"
+			},
+			{
+				"default": {
+					"interpolation": 1,
+					"points": [
+						{
+							"a": 1.0,
+							"b": 0.0,
+							"g": 0.0,
+							"pos": 0.0,
+							"r": 0.0
+						},
+						{
+							"a": 1.0,
+							"b": 1.0,
+							"g": 1.0,
+							"pos": 1.0,
+							"r": 1.0
+						}
+					],
+					"type": "Gradient"
+				},
+				"label": "",
+				"longdesc": "Gradient to be spread on the image",
+				"name": "gradient",
+				"shortdesc": "Gradient",
+				"type": "gradient"
+			}
+		],
+		"shortdesc": "Radial Gradient"
+	},
+	"type": "shader"
+}

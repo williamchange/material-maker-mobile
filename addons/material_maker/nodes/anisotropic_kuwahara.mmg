@@ -1,0 +1,536 @@
+{
+	"connections": [
+		{
+			"from": "shader_1",
+			"from_port": 0,
+			"to": "buffer_2",
+			"to_port": 0
+		},
+		{
+			"from": "buffer_2",
+			"from_port": 0,
+			"to": "gen_outputs",
+			"to_port": 0
+		},
+		{
+			"from": "shader_2",
+			"from_port": 0,
+			"to": "gaussian_blur_2",
+			"to_port": 0
+		},
+		{
+			"from": "_3",
+			"from_port": 0,
+			"to": "gaussian_blur_2",
+			"to_port": 1
+		},
+		{
+			"from": "gen_inputs",
+			"from_port": 0,
+			"to": "shader_2",
+			"to_port": 0
+		},
+		{
+			"from": "gen_inputs",
+			"from_port": 0,
+			"to": "shader_1",
+			"to_port": 0
+		},
+		{
+			"from": "gaussian_blur_2",
+			"from_port": 0,
+			"to": "shader_1",
+			"to_port": 1
+		}
+	],
+	"label": "Anisotropic Kuwahara",
+	"longdesc": "Edge-preserving smoothing filter",
+	"name": "anisotropic_kuwahara",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"nodes": [
+		{
+			"name": "shader_2",
+			"node_position": {
+				"x": -600.0,
+				"y": -160.0
+			},
+			"parameters": {
+				"s": 9
+			},
+			"seed_int": 0,
+			"shader_model": {
+				"code": "",
+				"global": "",
+				"inputs": [
+					{
+						"default": "vec4(0.0)",
+						"function": true,
+						"label": "",
+						"name": "in",
+						"type": "rgba"
+					}
+				],
+				"instance": [
+					"// The MIT License - Copyright (c) 2022 Garrett Gunnell",
+					"// Adapted from https://github.com/GarrettGunnell/Post-Processing/",
+					"// blob/871a7ffcc44174f237b4c0127db51026c438d7a4/Assets/Kuwahara%20Filter/AnisotropicKuwahara.shader",
+					"",
+					"vec4 $(name)_calc_eigenvectors(vec2 uv) {",
+					"\tvec2 d = 1.0/vec2($s);",
+					"\tvec3 Sx = (",
+					"\t\t 1.0 * $in(uv + vec2(-d.x, -d.y)).rgb +",
+					"\t\t 2.0 * $in(uv + vec2(-d.x,  0.0)).rgb +",
+					"\t\t 1.0 * $in(uv + vec2(-d.x,  d.y)).rgb +",
+					"\t\t-1.0 * $in(uv + vec2(d.x, -d.y)).rgb +",
+					"\t\t-2.0 * $in(uv + vec2(d.x,  0.0)).rgb +",
+					"\t\t-1.0 * $in(uv + vec2(d.x,  d.y)).rgb",
+					"\t) * 0.25;",
+					"",
+					"\tvec3 Sy = (",
+					"\t\t 1.0 * $in(uv + vec2(-d.x, -d.y)).rgb +",
+					"\t\t 2.0 * $in(uv + vec2( 0.0, -d.y)).rgb +",
+					"\t\t 1.0 * $in(uv + vec2( d.x, -d.y)).rgb +",
+					"\t\t-1.0 * $in(uv + vec2(-d.x, d.y)).rgb +",
+					"\t\t-2.0 * $in(uv + vec2( 0.0, d.y)).rgb +",
+					"\t\t-1.0 * $in(uv + vec2( d.x, d.y)).rgb",
+					"\t) * 0.25;",
+					"",
+					"\treturn vec4(dot(Sx, Sx), dot(Sy, Sy), dot(Sx, Sy), 1.0);",
+					"}"
+				],
+				"name": "calc_eigenvectors",
+				"outputs": [
+					{
+						"rgba": "$(name)_calc_eigenvectors($uv)",
+						"type": "rgba"
+					}
+				],
+				"parameters": [
+					{
+						"default": 9,
+						"first": 4,
+						"label": "",
+						"last": 13,
+						"name": "s",
+						"type": "size"
+					}
+				]
+			},
+			"type": "shader"
+		},
+		{
+			"name": "shader_1",
+			"node_position": {
+				"x": -360.0,
+				"y": -200.0
+			},
+			"parameters": {
+				"eccentricity": 1.0,
+				"s": 9,
+				"sharpness": 1.0,
+				"size": 6.0
+			},
+			"seed_int": 0,
+			"shader_model": {
+				"code": "",
+				"global": "",
+				"inputs": [
+					{
+						"default": "vec3(0.0)",
+						"function": true,
+						"label": "",
+						"name": "in",
+						"type": "rgb"
+					},
+					{
+						"default": "vec4(0.0)",
+						"function": true,
+						"label": "",
+						"name": "b",
+						"type": "rgba"
+					}
+				],
+				"instance": [
+					"// The MIT License - Copyright (c) 2022 Garrett Gunnell",
+					"// Adapted from https://github.com/GarrettGunnell/Post-Processing/",
+					"// blob/871a7ffcc44174f237b4c0127db51026c438d7a4/Assets/Kuwahara%20Filter/AnisotropicKuwahara.shader",
+					"",
+					"vec3 $(name)_anisotropic_kuwahara(vec2 uv, int size, float _sharpness, float _ecc) {",
+					"\tfloat sharpness = mix(3.0, 18.0, clamp(_sharpness, 0.0, 1.0));",
+					"\tint _KernelSize = max(0, size * 2);",
+					"\tconst float alpha = 1.0; const float _Hardness = 8.0; const float _ZeroCrossing = 0.58;",
+					"\tfloat zeta = 1.0 / (float(_KernelSize) / 2.0);",
+					"",
+					"\tfloat ecc = mix(0.7, 1.5, clamp(_ecc, 0.0, 1.0));",
+					"",
+					"\tvec4 g = $b(uv);",
+					"\tfloat lambda1 = 0.5 * (g.y + g.x + sqrt(g.y * g.y - 2.0 * g.x * g.y + g.x * g.x + 4.0 * g.z * g.z));",
+					"\tfloat lambda2 = 0.5 * (g.y + g.x - sqrt(g.y * g.y - 2.0 * g.x * g.y + g.x * g.x + 4.0 * g.z * g.z));",
+					"",
+					"\tvec2 v = vec2(lambda1 - g.x, -g.z);",
+					"\tfloat A = (lambda1 + lambda2 > 0.0) ? (lambda1 - lambda2) / (lambda1 + lambda2) : 0.0;",
+					"\tvec4 t = vec4(length(v) > 0.0 ? normalize(v) : vec2(0.0, 1.0), 0.0, A);",
+					"",
+					"\tint kernelRadius = _KernelSize / 2;",
+					"\tfloat a = float(kernelRadius) * clamp((alpha + t.w) / alpha, 0.1, 2.0);",
+					"\tfloat b = float(kernelRadius) * clamp(alpha / (alpha + t.w), 0.1, 2.0);",
+					"",
+					"\tfloat cos_phi = t.x;",
+					"\tfloat sin_phi = t.y;",
+					"",
+					"\tmat2 R = mat2(vec2(cos_phi, -sin_phi), vec2(sin_phi, cos_phi));",
+					"\tmat2 S = mat2(vec2(0.5 / a / ecc, 0.0), vec2(0.0, 0.5 / b * ecc));",
+					"",
+					"\tmat2 SR = S * R;",
+					"",
+					"\tint max_x = int(sqrt(a * a * cos_phi * cos_phi + b * b * sin_phi * sin_phi));",
+					"\tint max_y = int(sqrt(a * a * sin_phi * sin_phi + b * b * cos_phi * cos_phi));",
+					"",
+					"\tfloat zeroCross = _ZeroCrossing;",
+					"\tfloat sinZeroCross = sin(zeroCross);",
+					"\tfloat eta = (zeta + cos(zeroCross)) / (sinZeroCross * sinZeroCross);",
+					"",
+					"\tvec4 m[8];",
+					"\tvec3 s[8];",
+					"",
+					"\tfor (int k = 0; k < 8; ++k) {",
+					"\t\tm[k] = vec4(0.0);",
+					"\t\ts[k] = vec3(0.0);",
+					"\t}",
+					"",
+					"\tfor (int y = -max_y; y <= max_y; ++y) {",
+					"\t\tfor (int x = -max_x; x <= max_x; ++x) {",
+					"\t\t\tvec2 v = SR * vec2(float(x), float(y));",
+					"\t\t\tif (dot(v, v) <= 0.125) {",
+					"\t\t\t\tvec3 c = $in( uv + vec2(float(x), float(y)) * 1.0/vec2($s) ).rgb;",
+					"\t\t\t\tc = clamp(c, vec3(0.0), vec3(1.0));",
+					"\t\t\t\tfloat sum = 0.0;",
+					"\t\t\t\tfloat w[8];",
+					"\t\t\t\tfloat z, vxx, vyy;",
+					"",
+					"\t\t\t\t // Calculate Polynomial Weights",
+					"\t\t\t\tvxx = zeta - eta * v.x * v.x;",
+					"\t\t\t\tvyy = zeta - eta * v.y * v.y;",
+					"\t\t\t\tz = max(0.0, v.y + vxx);",
+					"\t\t\t\tw[0] = z * z;",
+					"\t\t\t\tsum += w[0];",
+					"\t\t\t\tz = max(0, -v.x + vyy); ",
+					"\t\t\t\tw[2] = z * z;",
+					"\t\t\t\tsum += w[2];",
+					"\t\t\t\tz = max(0.0, -v.y + vxx); ",
+					"\t\t\t\tw[4] = z * z;",
+					"\t\t\t\tsum += w[4];",
+					"\t\t\t\tz = max(0.0, v.x + vyy); ",
+					"\t\t\t\tw[6] = z * z;",
+					"\t\t\t\tsum += w[6];",
+					"\t\t\t\t v = sqrt(2.0) / 2.0 * vec2(v.x - v.y, v.x + v.y);",
+					"\t\t\t\tvxx = zeta - eta * v.x * v.x;",
+					"\t\t\t\tvyy = zeta - eta * v.y * v.y;",
+					"\t\t\t\tz = max(0, v.y + vxx); ",
+					"\t\t\t\tw[1] = z * z;",
+					"\t\t\t\tsum += w[1];",
+					"\t\t\t\tz = max(0.0, -v.x + vyy); ",
+					"\t\t\t\tw[3] = z * z;",
+					"\t\t\t\tsum += w[3];",
+					"\t\t\t\tz = max(0.0, -v.y + vxx); ",
+					"\t\t\t\tw[5] = z * z;",
+					"\t\t\t\tsum += w[5];",
+					"\t\t\t\tz = max(0.0, v.x + vyy); ",
+					"\t\t\t\tw[7] = z * z;",
+					"\t\t\t\tsum += w[7];",
+					"\t\t\t\t",
+					"\t\t\t\tfloat g = exp(-3.125 * dot(v, v)) / sum;",
+					"\t\t\t\t",
+					"\t\t\t\tfor (int k = 0; k < 8; ++k) {",
+					"\t\t\t\t\tfloat wk = w[k] * g;",
+					"\t\t\t\t\tm[k] += vec4(c * wk, wk);",
+					"\t\t\t\t\ts[k] += c * c * wk;",
+					"\t\t\t\t}",
+					"\t\t\t}",
+					"\t\t}",
+					"\t}",
+					"",
+					"\tvec4 result = vec4(0.0);",
+					"\tfor (int k = 0; k < 8; ++k) {",
+					"\t\tm[k].rgb /= m[k].w;",
+					"\t\ts[k] = abs(s[k] / m[k].w - m[k].rgb * m[k].rgb);",
+					"",
+					"\t\tfloat sigma2 = s[k].r + s[k].g + s[k].b;",
+					"\t\tfloat w = 1.0 / (1.0 + pow(_Hardness * 1000.0 * sigma2, 0.5 * sharpness));",
+					"",
+					"\t\tresult += vec4(m[k].rgb * w, w);",
+					"\t}",
+					"",
+					"\treturn clamp(result.rgb / result.w, vec3(0.0), vec3(1.0));",
+					"}"
+				],
+				"name": "anisotropic_kuwahara",
+				"outputs": [
+					{
+						"rgb": "$(name)_anisotropic_kuwahara($uv, int($size), $sharpness, $eccentricity * 0.5)",
+						"type": "rgb"
+					}
+				],
+				"parameters": [
+					{
+						"default": 10,
+						"first": 4,
+						"label": "",
+						"last": 13,
+						"name": "s",
+						"type": "size"
+					},
+					{
+						"control": "None",
+						"default": 5.0,
+						"label": "size",
+						"max": 32.0,
+						"min": 1.0,
+						"name": "size",
+						"shortdesc": "size",
+						"step": 1.0,
+						"type": "float"
+					},
+					{
+						"control": "None",
+						"default": 1.0,
+						"label": "sharpness",
+						"max": 1.0,
+						"min": 0.0,
+						"name": "sharpness",
+						"step": 0.01,
+						"type": "float"
+					},
+					{
+						"control": "None",
+						"default": 1.0,
+						"label": "eccentricity",
+						"max": 2.0,
+						"min": 0.0,
+						"name": "eccentricity",
+						"step": 0.01,
+						"type": "float"
+					}
+				]
+			},
+			"type": "shader"
+		},
+		{
+			"name": "_3",
+			"node_position": {
+				"x": -800.0,
+				"y": -40.0
+			},
+			"parameters": {
+				"val": 4.0
+			},
+			"seed_int": 0,
+			"shader_model": {
+				"code": "",
+				"global": "",
+				"inputs": [],
+				"instance": "",
+				"name": "uniformity",
+				"outputs": [
+					{
+						"f": "$val",
+						"type": "f"
+					}
+				],
+				"parameters": [
+					{
+						"control": "None",
+						"default": 4.0,
+						"label": "",
+						"max": 50.0,
+						"min": 0.0,
+						"name": "val",
+						"step": 1.0,
+						"type": "float"
+					}
+				]
+			},
+			"type": "shader"
+		},
+		{
+			"name": "gen_inputs",
+			"node_position": {
+				"x": -720.0,
+				"y": -280.0
+			},
+			"parameters": {
+
+			},
+			"ports": [
+				{
+					"longdesc": "Input Image",
+					"name": "port0",
+					"shortdesc": "Input",
+					"type": "rgb"
+				}
+			],
+			"seed_int": 0,
+			"type": "ios"
+		},
+		{
+			"name": "gen_outputs",
+			"node_position": {
+				"x": 11.1868200302124,
+				"y": -83.8302764892578
+			},
+			"parameters": {
+
+			},
+			"ports": [
+				{
+					"longdesc": "Filtered Image",
+					"name": "unnamed",
+					"shortdesc": "Output",
+					"type": "rgb"
+				}
+			],
+			"seed_int": 0,
+			"type": "ios"
+		},
+		{
+			"name": "gen_parameters",
+			"node_position": {
+				"x": -160.0,
+				"y": -480.0
+			},
+			"parameters": {
+				"eccentricity": 1.0,
+				"resolution": 9,
+				"sharpness": 1.0,
+				"size": 6.0,
+				"uniformity": 4.0
+			},
+			"seed_int": 0,
+			"type": "remote",
+			"widgets": [
+				{
+					"label": "Resolution",
+					"linked_widgets": [
+						{
+							"node": "shader_1",
+							"widget": "s"
+						},
+						{
+							"node": "shader_2",
+							"widget": "s"
+						},
+						{
+							"node": "buffer_2",
+							"widget": "size"
+						},
+						{
+							"node": "gaussian_blur_2",
+							"widget": "param0"
+						}
+					],
+					"longdesc": "Resolution used to sample the image",
+					"name": "resolution",
+					"shortdesc": "Input Resolution",
+					"type": "linked_control"
+				},
+				{
+					"label": "Size",
+					"linked_widgets": [
+						{
+							"node": "shader_1",
+							"widget": "size"
+						}
+					],
+					"longdesc": "Higher values produce more stylized results but also increases computation time.",
+					"name": "size",
+					"shortdesc": "Filter Size",
+					"type": "linked_control"
+				},
+				{
+					"label": "Uniformity",
+					"linked_widgets": [
+						{
+							"node": "_3",
+							"widget": "val"
+						}
+					],
+					"longdesc": "Uniformity of the image edge directions",
+					"name": "uniformity",
+					"shortdesc": "Uniformity",
+					"type": "linked_control"
+				},
+				{
+					"label": "Sharpness",
+					"linked_widgets": [
+						{
+							"node": "shader_1",
+							"widget": "sharpness"
+						}
+					],
+					"longdesc": "Edge Sharpness",
+					"name": "sharpness",
+					"shortdesc": "Sharpness",
+					"type": "linked_control"
+				},
+				{
+					"label": "Eccentricity",
+					"linked_widgets": [
+						{
+							"node": "shader_1",
+							"widget": "eccentricity"
+						}
+					],
+					"longdesc": "Affects directionality of the filter. Higher values preserve directional features more closely.",
+					"name": "eccentricity",
+					"shortdesc": "Eccentricity",
+					"type": "linked_control"
+				}
+			]
+		},
+		{
+			"name": "buffer_2",
+			"node_position": {
+				"x": -120.0,
+				"y": -200.0
+			},
+			"parameters": {
+				"size": 9
+			},
+			"seed_int": 0,
+			"type": "buffer",
+			"version": 1
+		},
+		{
+			"name": "gaussian_blur_2",
+			"node_position": {
+				"x": -640.0,
+				"y": -40.0
+			},
+			"parameters": {
+				"param0": 9,
+				"param1": 1.0,
+				"param2": 0.0,
+				"param3": false
+			},
+			"seed_int": 0,
+			"type": "gaussian_blur"
+		}
+	],
+	"parameters": {
+		"eccentricity": 1.0,
+		"resolution": 9,
+		"sharpness": 1.0,
+		"size": 6.0,
+		"uniformity": 4.0
+	},
+	"scroll_offset": {
+		"x": -702.712585449219,
+		"y": -510.868774414062
+	},
+	"seed_int": 0,
+	"shortdesc": "Anisotropic Kuwahara",
+	"type": "graph"
+}

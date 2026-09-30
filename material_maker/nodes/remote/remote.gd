@@ -1,0 +1,441 @@
+extends MMGraphNodeGeneric
+class_name MMGraphNodeRemote
+
+
+var old_state : Dictionary
+
+var links = {}
+
+
+@onready var grid = $Controls
+
+
+func _ready():
+	super._ready()
+
+
+func add_control(text : String, control : Control, is_named_param : bool, short_description : String = "", long_description : String = "") -> void:
+	var drag_button := Button.new()
+	drag_button.flat = true
+	drag_button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	drag_button.icon = get_theme_icon("arrow_updown", "MM_Icons")
+	drag_button.mouse_filter = Control.MOUSE_FILTER_STOP
+	grid.add_child(drag_button)
+	drag_button.set_drag_forwarding(
+			row_get_data.bind(drag_button.get_index(), control.name),
+			row_can_drop.bind(drag_button.get_index()),
+			row_drop_data.bind(drag_button.get_index()))
+
+	var line_edit : LineEdit = LineEdit.new()
+	line_edit.set_text(control.name)
+	line_edit.custom_minimum_size.x = 80
+	grid.add_child(line_edit)
+	line_edit.connect("text_changed", Callable(self, "on_param_name_changed").bind(control.name, line_edit))
+	line_edit.connect("text_submitted", Callable(self, "on_param_name_entered").bind(control.name, line_edit))
+	line_edit.connect("focus_exited", Callable(self, "on_param_name_entered2").bind(control.name, line_edit))
+
+	var label = preload("res://material_maker/widgets/linked_widgets/editable_label.tscn").instantiate()
+	label.set_text(text)
+	label.connect("label_changed", Callable(self, "on_label_changed").bind(control.name))
+	grid.add_child(label)
+
+	var description = preload("res://material_maker/widgets/desc_button/desc_button.tscn").instantiate()
+	description.short_description = short_description
+	description.long_description = long_description
+	description.connect("descriptions_changed", Callable(self, "_on_descriptions_changed").bind(control.name))
+	grid.add_child(description)
+	grid.add_child(control)
+	control.connect("mouse_entered", Callable(self, "on_enter_widget").bind(control))
+	control.connect("mouse_exited", Callable(self, "on_exit_widget").bind(control))
+	control.tooltip_text = ""
+
+	var button = Button.new()
+	if is_named_param:
+		button.icon = preload("res://material_maker/icons/edit.tres")
+		grid.add_child(button)
+		button.connect("pressed", Callable(self, "_on_Edit_pressed").bind(control.name))
+		button.tooltip_text = "Configure named parameter "+control.name
+	else:
+		button.icon = preload("res://material_maker/icons/link.tres")
+		grid.add_child(button)
+		button.connect("pressed", Callable(self, "_on_Link_pressed").bind(control.name))
+		button.tooltip_text = "Link another parameter"
+	button = Button.new()
+	button.icon = preload("res://material_maker/icons/remove.tres")
+	button.tooltip_text = "Remove parameter"
+	grid.add_child(button)
+	button.connect("pressed", Callable(self, "remove_parameter").bind(control.name))
+
+func update_node() -> void:
+	await get_tree().process_frame
+	# Show or hide the close button
+	close_button.visible = (generator.can_be_deleted()
+		if mm_globals.get_config(SETTINGS_NODE_CLOSE_BUTTON) else false)
+	# Delete the contents and wait until it's done
+	for c in grid.get_children():
+		grid.remove_child(c)
+		c.free()
+	title = generator.get_type_name()
+	controls = {}
+	var parameter_count : int = generator.get_parameter_defs().size()
+	for i in range(parameter_count):
+		var p = generator.get_parameter_defs()[i]
+		var control = create_parameter_control(p, false)
+		setup_linked_control_callbacks(control, false)
+		if control != null:
+			control.name = p.name
+			controls[control.name] = control
+			var widget = generator.get_widget(p.name)
+			var shortdesc : String = widget.shortdesc if widget.has("shortdesc") else ""
+			var longdesc : String = widget.longdesc if widget.has("longdesc") else ""
+			var is_named_param : bool = ( p.widget_type == "named_parameter" )
+			add_control(generator.get_widget(p.name).label, control, is_named_param, shortdesc, longdesc)
+			if generator.widgets[i].type == "config_control" and control is OptionButton:
+				var current = null
+				if control.get_item_count() > 0 and generator.parameters.has(p.name):
+					control.selected = generator.parameters[p.name]
+					current = control.get_item_text(control.selected)
+				control.add_separator()
+				control.add_item("<add configuration>")
+				if current != null:
+					control.add_separator()
+					control.add_item("<update "+current+">")
+					control.add_item("<remove "+current+">")
+	set_deferred("size", Vector2.ZERO)
+	initialize_properties()
+
+func _on_value_changed(new_value, variable : String) -> void:
+	var widget = generator.get_widget(variable)
+	if !widget.has("type"):
+		return
+	if widget.type == "config_control":
+		var configuration_count = widget.configurations.size()
+		var control = controls[variable]
+		if control is OptionButton:
+			if new_value < configuration_count:
+				super._on_value_changed(new_value, variable)
+				var current = control.get_item_text(new_value)
+				control.set_item_text(configuration_count+3, "<update "+current+">")
+				control.set_item_text(configuration_count+4, "<remove "+current+">")
+			else:
+				var current = control.get_item_text(generator.parameters[variable])
+				var command = new_value - widget.configurations.size()
+				match command:
+					1:
+						var dialog = preload("res://material_maker/windows/line_dialog/line_dialog.tscn").instantiate()
+						add_child(dialog)
+						var status = await dialog.enter_text("Configuration", "Enter a name for the new configuration", "")
+						if status.ok:
+							generator.add_configuration(variable, status.text)
+					3:
+						generator.update_configuration(variable, current)
+					4:
+						generator.parameters[variable] = 0
+						generator.remove_configuration(variable, current)
+					_:
+						print(command)
+			return
+	super._on_value_changed(new_value, variable)
+
+func undo_redo_register_change(action_name : String, previous_state : Dictionary):
+	var new_state = generator.serialize().duplicate(true)
+	if new_state.hash() == previous_state.hash():
+		return
+	get_parent().undoredo_create_step(action_name, generator.get_hier_name(), previous_state, new_state)
+
+func rearrange_parameter(from : int, to : int, is_after : bool) -> void:
+	old_state = generator.serialize().duplicate(true)
+	generator.rearrange_parameter(from, to, is_after)
+	undo_redo_register_change("Rearrange parameter", old_state)
+
+func remove_parameter(widget_name : String) -> void:
+	old_state = generator.serialize().duplicate(true)
+	annotate_linked_controls(widget_name, false)
+	generator.remove_parameter(widget_name)
+	undo_redo_register_change("Remove parameter", old_state)
+
+func on_param_name_changed(new_name : String, param_name : String, line_edit : LineEdit) -> void:
+	if generator.rename(param_name, new_name, true):
+		line_edit.add_theme_color_override("font_color", mm_globals.main_window.theme.get_color("font_color", "LineEdit"))
+	else:
+		line_edit.add_theme_color_override("font_color", Color(1.0, 0.0, 0.0))
+
+func on_param_name_entered(new_name : String, param_name : String, _line_edit : LineEdit) -> void:
+	old_state = generator.serialize().duplicate(true)
+	generator.rename(param_name, new_name)
+	undo_redo_register_change("Change parameter name", old_state)
+
+func on_param_name_entered2(param_name : String, line_edit : LineEdit) -> void:
+	old_state = generator.serialize().duplicate(true)
+	on_param_name_entered(line_edit.text, param_name, line_edit)
+	undo_redo_register_change("Change parameter name", old_state)
+
+func on_label_changed(new_label, param_name) -> void:
+	old_state = generator.serialize().duplicate(true)
+	generator.set_label(param_name, new_label)
+	undo_redo_register_change("Change parameter label", old_state)
+
+func _on_descriptions_changed(shortdesc, longdesc, param_name) -> void:
+	old_state = generator.serialize().duplicate(true)
+	var widget = generator.get_widget(param_name)
+	if widget != null:
+		if shortdesc == "":
+			widget.erase("shortdesc")
+		else:
+			widget.shortdesc = shortdesc
+		if longdesc == "":
+			widget.erase("longdesc")
+		else:
+			widget.longdesc = longdesc
+	undo_redo_register_change("Change parameter description", old_state)
+
+func link_parameter(widget_name : String, target_generator : MMGenBase, target_parameter : String) -> void:
+	generator.link_parameter(widget_name, target_generator, target_parameter)
+	undo_redo_register_change("Change parameter name", old_state)
+
+func _on_AddLink_pressed() -> void:
+	old_state = generator.serialize().duplicate(true)
+	var control = generator.create_linked_control("Unnamed")
+	var widget = Control.new()
+	widget.name = control
+	add_control("Unnamed", widget, false)
+	var link = MMNodeLink.new(get_parent())
+	link.pick(widget, self, control, true)
+
+func _on_AddConfig_pressed() -> void:
+	old_state = generator.serialize().duplicate(true)
+	var control = generator.create_config_control("Unnamed")
+	var widget = Control.new()
+	widget.name = control
+	add_control("Unnamed", widget, false)
+	var link = MMNodeLink.new(get_parent())
+	link.pick(widget, self, control, true)
+
+func _on_AddNamed_pressed():
+	old_state = generator.serialize().duplicate(true)
+	var _control = generator.create_named_parameter("Unnamed")
+	update_node()
+	undo_redo_register_change("Add named parameter", old_state)
+
+func _on_Link_pressed(param_name) -> void:
+	var link = MMNodeLink.new(get_parent())
+	if controls.has(param_name):
+		old_state = generator.serialize().duplicate(true)
+		link.pick(controls[param_name], self, param_name)
+
+func _on_Edit_pressed(param_name) -> void:
+	for p in generator.get_parameter_defs():
+		if p.name == param_name:
+			var dialog = preload("res://material_maker/nodes/remote/named_parameter_dialog.tscn").instantiate()
+			add_child(dialog)
+			var result = await dialog.configure_param(p.min, p.max, p.step, p.default)
+			if result.keys().size() == 4:
+				old_state = generator.serialize().duplicate(true)
+				generator.configure_named_parameter(param_name, result.min, result.max, result.step, result.default)
+				undo_redo_register_change("Configure named parameter", old_state)
+
+func _on_Remote_resize_request(new_minsize) -> void:
+	size = new_minsize
+
+func _on_HBoxContainer_minimum_size_changed() -> void:
+	print("_on_HBoxContainer_minimum_size_changed "+str($HBoxContainer.custom_minimum_size))
+
+func on_parameter_changed(p, v) -> void:
+	if p == "":
+		update_node()
+	else:
+		super.on_parameter_changed(p, v)
+		if generator.name == "gen_parameter" and generator.get_parent() is MMGenBase:
+			generator.get_parent().set_parameter(p, v)
+		annotate_linked_controls(p, true)
+
+func on_enter_widget(widget) -> void:
+	var w = generator.get_widget(widget.name)
+	if !w.has("linked_widgets"):
+		return
+	var new_links = []
+	for l in w.linked_widgets:
+		var graph_node = get_parent().get_node("node_"+l.node)
+		if graph_node != null and graph_node.controls.has(l.widget):
+			var control = graph_node.controls[l.widget]
+			if control != null:
+				var link = MMNodeLink.new(get_parent())
+				link.show_link(widget, control)
+				new_links.push_back(link)
+	# free existing links if any
+	on_exit_widget(widget)
+	# store new links
+	links[widget] = new_links
+
+func on_exit_widget(widget) -> void:
+	if links.has(widget):
+		for l in links[widget]:
+			l.queue_free()
+		links.erase(widget)
+
+func modulate_row_controls(row_index: int, color: Color):
+	for i in range(grid.columns * row_index, grid.columns * row_index + grid.columns):
+		grid.get_child(i).modulate = color
+
+func row_get_data(_at_pos: Vector2, index: int, widget_name: String) -> Dictionary:
+	var preview_root := Control.new()
+
+	var bg_panel := PanelContainer.new()
+	bg_panel.theme_type_variation = "MM_PanelBackground"
+
+	var panel_stylebox := get_theme_stylebox("panel", "GraphNode").duplicate()
+	panel_stylebox.set_corner_radius_all(5)
+	panel_stylebox.set_border_width_all(0)
+	panel_stylebox.set_expand_margin_all(0)
+	panel_stylebox.set_content_margin_all(4.0)
+	panel_stylebox.bg_color.a = 0.8
+	bg_panel.add_theme_stylebox_override("panel", panel_stylebox)
+
+	var grid_container := GridContainer.new()
+	bg_panel.add_child(grid_container)
+	grid_container.columns = grid.columns
+	for c in range(index, index + grid.columns):
+		var src := grid.get_child(c)
+		var dupe := src.duplicate(true)
+
+		if c == index and dupe is Button:
+			dupe.toggle_mode = true
+			dupe.button_pressed = true
+
+		dupe.custom_minimum_size.x = src.size.x
+		grid_container.add_child(dupe)
+
+	bg_panel.position = -Vector2(16, 16)
+	preview_root.add_child(bg_panel)
+
+	# match control scale to graph edit zoom
+	preview_root.scale = Vector2.ONE * get_parent().zoom
+
+	var row_index : int = floor(index / grid.columns)
+	modulate_row_controls(row_index, Color.TRANSPARENT)
+	set_drag_preview(preview_root)
+
+	return { "row_index": row_index, "widget_name": widget_name, "node_name": name }
+
+func row_can_drop(_at_pos: Vector2, data: Dictionary, index: int) -> bool:
+	return data.row_index != floor(index / grid.columns) and data.node_name == name
+
+func row_drop_data(at_pos: Vector2, data: Dictionary, index: int) -> void:
+	var row_index := int(index / grid.columns)
+	var drop_pos_y : float = at_pos.y / grid.get_child(row_index).size.y
+	rearrange_parameter(data.row_index, row_index, drop_pos_y > 0.5)
+
+	# workaround FloatEdits' focused state when dropping rows
+	await get_tree().process_frame
+	for float_edit in grid.get_children():
+		if float_edit is FloatEdit:
+			float_edit.get_child(0).add_theme_stylebox_override(
+					"fill", get_theme_stylebox("fill_normal", "MM_NodeFloatEdit"))
+			float_edit.get_child(0).add_theme_stylebox_override(
+					"background", get_theme_stylebox("normal","MM_NodeFloatEdit"))
+
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_DRAG_END:
+			grid.get_children().map(func(c): c.modulate = Color.WHITE)
+
+## Annotate remotely-linked parameter controls for
+## ease of drawing links back to the remote.
+func annotate_linked_controls(p : String, is_setup : bool) -> void:
+	var cleanup_callback : Callable = func(c : Control) -> void:
+			c.remove_meta("linked_parameters")
+			setup_linked_control_callbacks(c, false)
+
+	var widget : Dictionary = generator.get_widget(p)
+	if not widget.is_empty() and widget.type == "linked_control":
+		for w in widget.linked_widgets:
+			var node : GraphNode = get_parent().get_node(NodePath("node_" + w.node))
+			var control : Control = node.controls[w.widget]
+			var linked_params : Array[Dictionary]
+
+			if is_setup:
+				if control.has_meta("linked_parameters"):
+					linked_params = control.get_meta("linked_parameters")
+				linked_params.append({ "remote": self, "param": widget.name })
+				control.set_meta("linked_parameters", linked_params)
+				setup_linked_control_callbacks(control, true)
+				if not tree_exiting.is_connected(cleanup_callback.bind(control)):
+					tree_exiting.connect(cleanup_callback.bind(control))
+			else:
+				control.remove_meta("linked_parameters")
+				setup_linked_control_callbacks(control, false)
+				if tree_exiting.is_connected(cleanup_callback.bind(control)):
+					tree_exiting.disconnect(cleanup_callback.bind(control))
+
+## Draw link(s) from [param linked_control] to linked remote parameter control(s).
+static func on_linked_control_entered(linked_control : Control) -> void:
+	if linked_control.has_meta("linked_parameters"):
+		mm_globals.set_tip_text("#MMB: Jump to source remote")
+		var linked_params : Array[Dictionary] = linked_control.get_meta("linked_parameters")
+		var new_links : Array[MMNodeLink]
+		for l in linked_params:
+			var remote : MMGraphNodeRemote = l.remote
+			if remote.controls.has(l.param) and remote.controls[l.param]:
+				var link : MMNodeLink = MMNodeLink.new(remote.get_parent())
+				link.show_link(remote.controls[l.param], linked_control)
+				new_links.append(link)
+		var _links : Dictionary[String, Array]
+		if linked_control.has_meta("links"):
+			_links = linked_control.get_meta("links")
+		_links[linked_control.name] = new_links
+		linked_control.set_meta("links", _links)
+
+## Hide link(s) from [param linked_control] to linked remote parameter control(s).
+static func on_linked_control_exited(linked_control : Control) -> void:
+	if linked_control.has_meta("links"):
+		var _links : Dictionary[String, Array] = linked_control.get_meta("links")
+		if _links.has(linked_control.name):
+			var control_links : Array[MMNodeLink] = _links[linked_control.name]
+			for l in control_links:
+				l.queue_free()
+		_links.erase(linked_control.name)
+
+## Handle jump to source remote node from [param linked_control].
+static func on_linked_control_gui_input(event : InputEvent, linked_control : Control) -> void:
+	if not linked_control.has_meta("linked_parameters"):
+		return
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_MIDDLE and event.pressed:
+		var link : Dictionary = linked_control.get_meta("linked_parameters")[0]
+		var graph : MMGraphEdit = link.remote.get_parent()
+		for l in graph.get_children():
+			if l is MMNodeLink:
+				l.hide()
+		jump_to_source(link.remote, link.param, graph)
+
+## Centers [param graph] view on [param remote] node and
+## highlight source remote [param param] control.
+static func jump_to_source(remote : MMGraphNodeRemote, param : String, graph : MMGraphEdit) -> void:
+	var remote_param : Control = remote.controls[param]
+	graph.scroll_offset = (remote.position_offset + 0.5 * remote.size) * graph.zoom - 0.5 * graph.size
+
+	const remote_blink : Color = Color(1.5, 1.5, 1.5, 1.0)
+	const control_blink : Color = Color(0.9, 1.5, 0.9, 1.0)
+	var tween : Tween = graph.get_tree().create_tween()
+	tween.tween_property(remote, "modulate", remote_blink, 0.2).set_trans(Tween.TRANS_CUBIC)
+	tween.tween_property(remote, "modulate", Color.WHITE, 0.6).set_trans(Tween.TRANS_CUBIC).set_delay(0.3)
+	tween.parallel().tween_property(remote_param, "modulate", control_blink, 0.2).set_trans(Tween.TRANS_CUBIC)
+	tween.parallel().tween_property(remote_param, "modulate", Color.WHITE, 0.8).set_trans(Tween.TRANS_CUBIC).set_delay(0.3)
+	remote.selected = true
+	await tween.finished
+
+## Helper function to map signals to callables.
+static func setup_linked_control_callbacks(c : Control, is_connect : bool) -> void:
+	var signal_map : Dictionary[Signal, Callable] = {
+		c.mouse_entered : on_linked_control_entered.bind(c),
+		c.mouse_exited : on_linked_control_exited.bind(c),
+		c.gui_input : on_linked_control_gui_input.bind(c)
+	}
+
+	for s : Signal in signal_map:
+		var callable : Callable = signal_map[s]
+		if is_connect:
+			if not s.is_connected(callable):
+				s.connect(callable)
+		else:
+			if s.is_connected(callable):
+				s.disconnect(callable)

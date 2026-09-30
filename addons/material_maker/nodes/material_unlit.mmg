@@ -1,0 +1,686 @@
+{
+	"export": {
+
+	},
+	"name": "material_unlit",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"blend": 0
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"shortdesc": "Dynamic Unlit Material",
+		"longdesc" : "Simple unlit material",
+		"code": "",
+		"custom": "",
+		"exports": {
+			"Godot 3/CanvasItem": {
+				"export_extension": "tres",
+				"files": [
+					{
+						"file_name": "$(path_prefix).tres",
+						"template": [
+							"[gd_resource type=\"ShaderMaterial\" load_steps=2 format=2]",
+							"[ext_resource path=\"$(file_prefix).gdshader\" type=\"Shader\" id=1]",
+							"$begin_buffers",
+							"[ext_resource path=\"$(file_prefix)_texture_$(buffer_index).png\" type=\"Texture\" id=$(expr:$(buffer_index)+1)]",
+							"$end_buffers",
+							"[resource]",
+							"shader = ExtResource( 1 )",
+							"$begin_buffers",
+							"shader_param/texture_$(buffer_index) = ExtResource( $(expr:$(buffer_index)+1) )",
+							"$end_buffers",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix).gdshader",
+						"template": [
+							"shader_type canvas_item;",
+							"$begin_generate",
+							"render_mode unshaded, blend_$blend;",
+							"$end_generate",
+							"uniform vec3 uv1_scale = vec3(1.0, 1.0, 1.0);",
+							"uniform vec3 uv1_offset = vec3(0.0, 0.0, 0.0);",
+							"uniform float variation = 0.0;",
+							"varying float elapsed_time;",
+							"void vertex() {",
+							"\telapsed_time = TIME;",
+							"\tUV = UV*uv1_scale.xy+uv1_offset.xy;",
+							"}",
+							"$definitions float_uniform_to_const,rename_buffers",
+							"void fragment() {",
+							"\tfloat _seed_variation_ = variation;",
+							"\tvec4 _controlled_variation_ = vec4(0.0);",
+							"\tvec2 uv = fract(UV);",
+							"$begin_generate rename_buffers",
+							"\tvec4 color_tex = $color_tex(uv);",
+							"\tcolor_tex = mix(pow((color_tex + vec4(0.055)) * (1.0 / (1.0 + 0.055)),vec4(2.4)),color_tex * (1.0 / 12.92),lessThan(color_tex,vec4(0.04045)));",
+							"\tCOLOR = color_tex;",
+							"$end_generate",
+							"}",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix)_texture_$(buffer_index).png",
+						"type": "buffers"
+					}
+				]
+			},
+			"Godot 3/Spatial": {
+				"export_extension": "tres",
+				"files": [
+					{
+						"file_name": "$(path_prefix).tres",
+						"template": [
+							"[gd_resource type=\"ShaderMaterial\" load_steps=2 format=2]",
+							"[ext_resource path=\"$(file_prefix).gdshader\" type=\"Shader\" id=1]",
+							"$begin_buffers",
+							"[ext_resource path=\"$(file_prefix)_texture_$(buffer_index).png\" type=\"Texture\" id=$(expr:$(buffer_index)+1)]",
+							"$end_buffers",
+							"[resource]",
+							"shader = ExtResource( 1 )",
+							"$begin_buffers",
+							"shader_param/texture_$(buffer_index) = ExtResource( $(expr:$(buffer_index)+1) )",
+							"$end_buffers",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix).gdshader",
+						"template": [
+							"shader_type spatial;",
+							"$begin_generate",
+							"render_mode unshaded, blend_$blend;",
+							"$end_generate",
+							"uniform vec3 uv1_scale = vec3(1.0, 1.0, 1.0);",
+							"uniform vec3 uv1_offset = vec3(0.0, 0.0, 0.0);",
+							"uniform float variation = 0.0;",
+							"varying float elapsed_time;",
+							"void vertex() {",
+							"\telapsed_time = TIME;",
+							"\tUV = UV*uv1_scale.xy+uv1_offset.xy;",
+							"}",
+							"$definitions float_uniform_to_const,rename_buffers",
+							"void fragment() {",
+							"\tfloat _seed_variation_ = variation;",
+							"\tvec4 _controlled_variation_ = vec4(0.0);",
+							"\tvec2 uv = fract(UV);",
+							"$begin_generate rename_buffers",
+							"\tvec4 color_tex = $color_tex(uv);",
+							"\tcolor_tex = mix(pow((color_tex + vec4(0.055)) * (1.0 / (1.0 + 0.055)),vec4(2.4)),color_tex * (1.0 / 12.92),lessThan(color_tex,vec4(0.04045)));",
+							"\tALBEDO = color_tex.rgb;",
+							"\tALPHA = color_tex.a;",
+							"$end_generate",
+							"}",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix)_texture_$(buffer_index).png",
+						"type": "buffers"
+					}
+				]
+			},
+			"Godot 4/CanvasItem": {
+				"export_extension": "tres",
+				"files": [
+					{
+						"file_name": "$(path_prefix).tres",
+						"template": [
+							"[gd_resource type=\"ShaderMaterial\" load_steps=2 format=2]",
+							"[ext_resource path=\"$(file_prefix).gdshader\" type=\"Shader\" id=1]",
+							"$begin_buffers",
+							"[ext_resource path=\"$(file_prefix)_texture_$(buffer_index).png\" type=\"Texture\" id=$(expr:$(buffer_index)+1)]",
+							"$end_buffers",
+							"[resource]",
+							"shader = ExtResource( 1 )",
+							"$begin_buffers",
+							"shader_parameter/texture_$(buffer_index) = ExtResource( $(expr:$(buffer_index)+1) )",
+							"$end_buffers",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix).gdshader",
+						"template": [
+							"shader_type canvas_item;",
+							"$begin_generate",
+							"render_mode unshaded, blend_$blend;",
+							"$end_generate",
+							"uniform vec3 uv1_scale = vec3(1.0, 1.0, 1.0);",
+							"uniform vec3 uv1_offset = vec3(0.0, 0.0, 0.0);",
+							"uniform float variation = 0.0;",
+							"varying float elapsed_time;",
+							"void vertex() {",
+							"\telapsed_time = TIME;",
+							"\tUV = UV*uv1_scale.xy+uv1_offset.xy;",
+							"}",
+							"$definitions float_uniform_to_const,rename_buffers",
+							"void fragment() {",
+							"\tfloat _seed_variation_ = variation;",
+							"\tvec4 _controlled_variation_ = vec4(0.0);",
+							"\tvec2 uv = fract(UV);",
+							"$begin_generate rename_buffers",
+							"\tvec4 color_tex = $color_tex(uv);",
+							"\tcolor_tex = mix(pow((color_tex + vec4(0.055)) * (1.0 / (1.0 + 0.055)),vec4(2.4)),color_tex * (1.0 / 12.92),lessThan(color_tex,vec4(0.04045)));",
+							"\tCOLOR = color_tex;",
+							"$end_generate",
+							"}",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix)_texture_$(buffer_index).png",
+						"type": "buffers"
+					}
+				]
+			},
+			"Godot 4/Spatial": {
+				"export_extension": "tres",
+				"files": [
+					{
+						"file_name": "$(path_prefix).tres",
+						"template": [
+							"[gd_resource type=\"ShaderMaterial\" load_steps=2 format=2]",
+							"[ext_resource path=\"$(file_prefix).gdshader\" type=\"Shader\" id=1]",
+							"$begin_buffers",
+							"[ext_resource path=\"$(file_prefix)_texture_$(buffer_index).png\" type=\"Texture\" id=$(expr:$(buffer_index)+1)]",
+							"$end_buffers",
+							"[resource]",
+							"shader = ExtResource( 1 )",
+							"$begin_buffers",
+							"shader_parameter/texture_$(buffer_index) = ExtResource( $(expr:$(buffer_index)+1) )",
+							"$end_buffers",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix).gdshader",
+						"template": [
+							"shader_type spatial;",
+							"$begin_generate",
+							"render_mode unshaded, blend_$blend;",
+							"$end_generate",
+							"uniform vec3 uv1_scale = vec3(1.0, 1.0, 1.0);",
+							"uniform vec3 uv1_offset = vec3(0.0, 0.0, 0.0);",
+							"uniform float variation = 0.0;",
+							"varying float elapsed_time;",
+							"void vertex() {",
+							"\telapsed_time = TIME;",
+							"\tUV = UV*uv1_scale.xy+uv1_offset.xy;",
+							"}",
+							"$definitions float_uniform_to_const,rename_buffers",
+							"void fragment() {",
+							"\tfloat _seed_variation_ = variation;",
+							"\tvec4 _controlled_variation_ = vec4(0.0);",
+							"\tvec2 uv = fract(UV);",
+							"$begin_generate rename_buffers",
+							"\tvec4 color_tex = $color_tex(uv);",
+							"\tcolor_tex = mix(pow((color_tex + vec4(0.055)) * (1.0 / (1.0 + 0.055)),vec4(2.4)),color_tex * (1.0 / 12.92),lessThan(color_tex,vec4(0.04045)));",
+							"\tALBEDO = color_tex.rgb;",
+							"\tALPHA = color_tex.a;",
+							"$end_generate",
+							"}",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix)_texture_$(buffer_index).png",
+						"type": "buffers"
+					}
+				]
+			},
+			"Unity": {
+				"export_extension": "mat",
+				"files": [
+					{
+						"file_name": "$(path_prefix).shader",
+						"template": [
+							"Shader \"Unlit/NewUnlitShader\"",
+							"{",
+							"\tProperties",
+							"\t{",
+							"\t}",
+							"\tSubShader",
+							"\t{",
+							"\t\tTags { \"RenderType\"=\"Opaque\" }",
+							"\t\tLOD 100",
+							"\t\tPass",
+							"\t\t{",
+							"\t\t\tBlend One One",
+							"\t\t\tCGPROGRAM",
+							"\t\t\t#pragma vertex vert",
+							"\t\t\t#pragma fragment frag",
+							"\t\t\t// make fog work",
+							"\t\t\t#pragma multi_compile_fog",
+							"\t\t\t#include \"UnityCG.cginc\"",
+							"\t\t\tstruct appdata",
+							"\t\t\t{",
+							"\t\t\t\tfloat4 vertex : POSITION;",
+							"\t\t\t\tfloat2 uv : TEXCOORD0;",
+							"\t\t\t};",
+							"\t\t\tstruct v2f",
+							"\t\t\t{",
+							"\t\t\t\tfloat2 uv : TEXCOORD0;",
+							"\t\t\t\tUNITY_FOG_COORDS(1)",
+							"\t\t\t\tfloat4 vertex : SV_POSITION;",
+							"\t\t\t};",
+							"$definitions hlsl,rename_buffers,unity",
+							"\t\t",
+							"\t\t\tv2f vert (appdata v) {",
+							"\t\t\t\tv2f o;",
+							"\t\t\t\to.vertex = UnityObjectToClipPos(v.vertex);",
+							"\t\t\t\to.uv = v.uv;",
+							"\t\t\t\tUNITY_TRANSFER_FOG(o,o.vertex);",
+							"\t\t\t\treturn o;",
+							"\t\t\t}",
+							"\t\t\tfixed4 frag (v2f i) : SV_Target {",
+							"\t\t\t\tfloat _seed_variation_ = 0.0;",
+							"\t\t\t\tfloat4 _controlled_variation_ = float4(0.0, 0.0, 0.0, 0.0);",
+							"\t\t\t\tfloat2 uv = i.uv;",
+							"$begin_generate hlsl,rename_buffers,unity",
+							"\t\t\t\t// sample the generated texture",
+							"\t\t\t\tfixed4 col = $color_tex(uv);",
+							"$end_generate",
+							"\t\t\t\t// apply fog",
+							"\t\t\t\tUNITY_APPLY_FOG(i.fogCoord, col);",
+							"\t\t\t\treturn col;",
+							"\t\t\t}",
+							"\t\t\tENDCG",
+							"\t\t}",
+							"\t}",
+							"}",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix)_texture_$(buffer_index).png",
+						"type": "buffers"
+					},
+					{
+						"file_name": "$(path_prefix)_texture_$(buffer_index).png.meta",
+						"template": [
+							"fileFormatVersion: 2",
+							"guid: $uid(tex_$(buffer_index))",
+							"TextureImporter:",
+							"  internalIDToNameTable: []",
+							"  externalObjects: {}",
+							"  serializedVersion: 11",
+							"  mipmaps:",
+							"\tmipMapMode: 0",
+							"\tenableMipMap: 1",
+							"\tsRGBTexture: 1",
+							"\tlinearTexture: 0",
+							"\tfadeOut: 0",
+							"\tborderMipMap: 0",
+							"\tmipMapsPreserveCoverage: 0",
+							"\talphaTestReferenceValue: 0.5",
+							"\tmipMapFadeDistanceStart: 1",
+							"\tmipMapFadeDistanceEnd: 3",
+							"  bumpmap:",
+							"\tconvertToNormalMap: 0",
+							"\texternalNormalMap: 0",
+							"\theightScale: 0.25",
+							"\tnormalMapFilter: 0",
+							"  isReadable: 0",
+							"  streamingMipmaps: 0",
+							"  streamingMipmapsPriority: 0",
+							"  vTOnly: 0",
+							"  grayScaleToAlpha: 0",
+							"  generateCubemap: 6",
+							"  cubemapConvolution: 0",
+							"  seamlessCubemap: 0",
+							"  textureFormat: 1",
+							"  maxTextureSize: 2048",
+							"  textureSettings:",
+							"\tserializedVersion: 2",
+							"\tfilterMode: -1",
+							"\taniso: -1",
+							"\tmipBias: -100",
+							"\twrapU: -1",
+							"\twrapV: -1",
+							"\twrapW: -1",
+							"  nPOTScale: 1",
+							"  lightmap: 0",
+							"  compressionQuality: 50",
+							"  spriteMode: 0",
+							"  spriteExtrude: 1",
+							"  spriteMeshType: 1",
+							"  alignment: 0",
+							"  spritePivot: {x: 0.5, y: 0.5}",
+							"  spritePixelsToUnits: 100",
+							"  spriteBorder: {x: 0, y: 0, z: 0, w: 0}",
+							"  spriteGenerateFallbackPhysicsShape: 1",
+							"  alphaUsage: 1",
+							"  alphaIsTransparency: 0",
+							"  spriteTessellationDetail: -1",
+							"  textureType: 0",
+							"  textureShape: 1",
+							"  singleChannelComponent: 0",
+							"  flipbookRows: 1",
+							"  flipbookColumns: 1",
+							"  maxTextureSizeSet: 0",
+							"  compressionQualitySet: 0",
+							"  textureFormatSet: 0",
+							"  ignorePngGamma: 0",
+							"  applyGammaDecoding: 0",
+							"  platformSettings:",
+							"  - serializedVersion: 3",
+							"\tbuildTarget: DefaultTexturePlatform",
+							"\tmaxTextureSize: 2048",
+							"\tresizeAlgorithm: 0",
+							"\ttextureFormat: -1",
+							"\ttextureCompression: 1",
+							"\tcompressionQuality: 50",
+							"\tcrunchedCompression: 0",
+							"\tallowsAlphaSplitting: 0",
+							"\toverridden: 0",
+							"\tandroidETC2FallbackOverride: 0",
+							"\tforceMaximumCompressionQuality_BC6H_BC7: 0",
+							"  spriteSheet:",
+							"\tserializedVersion: 2",
+							"\tsprites: []",
+							"\toutline: []",
+							"\tphysicsShape: []",
+							"\tbones: []",
+							"\tspriteID: ",
+							"\tinternalID: 0",
+							"\tvertices: []",
+							"\tindices: ",
+							"\tedges: []",
+							"\tweights: []",
+							"\tsecondaryTextures: []",
+							"  spritePackingTag: ",
+							"  pSDRemoveMatte: 0",
+							"  pSDShowRemoveMatteOption: 0",
+							"  userData: ",
+							"  assetBundleName: ",
+							"  assetBundleVariant: ",
+							""
+						],
+						"type": "buffer_templates"
+					},
+					{
+						"file_name": "$(path_prefix).mat",
+						"template": [
+							"%YAML 1.1",
+							"%TAG !u! tag:unity3d.com,2011:",
+							"--- !u!21 &2100000",
+							"Material:",
+							"  serializedVersion: 6",
+							"  m_ObjectHideFlags: 0",
+							"  m_CorrespondingSourceObject: {fileID: 0}",
+							"  m_PrefabInstance: {fileID: 0}",
+							"  m_PrefabAsset: {fileID: 0}",
+							"  m_Name: $(file_prefix)",
+							"  m_Shader: {fileID: 4800000, guid: $uid(shader), type: 3}",
+							"  m_ShaderKeywords: ",
+							"  m_LightmapFlags: 4",
+							"  m_EnableInstancingVariants: 0",
+							"  m_DoubleSidedGI: 0",
+							"  m_CustomRenderQueue: -1",
+							"  stringTagMap: {}",
+							"  disabledShaderPasses: []",
+							"  m_SavedProperties:",
+							"    serializedVersion: 3",
+							"    m_TexEnvs:",
+							"    - _MainTex:",
+							"        m_Texture: {fileID: 2800000, guid: 6c5d2d4e94384751a0ce7d6619e0d49a, type: 3}",
+							"        m_Scale: {x: 1, y: 1}",
+							"        m_Offset: {x: 0, y: 0}",
+							"$begin_buffers",
+							"    - texture_$(buffer_index):",
+							"        m_Texture: {fileID: 2800000, guid: $uid(tex_$(buffer_index)), type: 3}",
+							"        m_Scale: {x: 1, y: 1}",
+							"        m_Offset: {x: 0, y: 0}",
+							"$end_buffers",
+							"  m_BuildTextureStacks: []",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix).shader.meta",
+						"template": [
+							"fileFormatVersion: 2",
+							"guid: $uid(shader)",
+							"ShaderImporter:",
+							"  externalObjects: {}",
+							"  defaultTextures: []",
+							"  nonModifiableTextures: []",
+							"  preprocessorOverride: 0",
+							"  userData: ",
+							"  assetBundleName: ",
+							"  assetBundleVariant: ",
+							""
+						],
+						"type": "template"
+					}
+				]
+			},
+			"Unreal/Unreal Engine 4": {
+				"export_extension": "mm2ue",
+				"files": [
+					{
+						"file_name": "$(path_prefix).mm2ue",
+						"template": [
+							"/*",
+							"Instructions to setup this material:",
+							"- copy material_unlit.uasset and open the copy",
+							"$begin_buffers",
+							"- create a TextureObject for $(file_prefix)_texture_$(buffer_index).png in the graph",
+							"  and a new input for texture_$(buffer_index) in the custom node, and connect them",
+							"$end_buffers",
+							"- copy the shader code below and paste it into the Custom node",
+							"*/",
+							"struct Functions {",
+							"$definitions hlsl,rename_buffers,unreal",
+							"\tfixed4 generated_shader(float2 uv) {",
+							"\t\tfloat _seed_variation_ = 0.0;",
+							"\t\tfloat4 _controlled_variation_ = float4(0.0, 0.0, 0.0, 0.0);",
+							"$begin_generate hlsl,rename_buffers,unreal",
+							"\t\t// sample the generated texture",
+							"\t\treturn $color_tex(uv);",
+							"$end_generate",
+							"\t}",
+							"};",
+							"Functions f;",
+							"return f.generated_shader(TexCoords);",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix)_texture_$(buffer_index).png",
+						"type": "buffers"
+					}
+				]
+			},
+			"Unreal/Unreal Engine 5": {
+				"export_extension": "py",
+				"files": [
+					{
+						"file_name": "$(path_prefix).py",
+						"prompt_overwrite": false,
+						"template": [
+							"import unreal",
+							"import sys",
+							"sys.path.append('$(material_maker_path)$(path_separator)export')",
+							"import mm",
+							"from importlib import reload",
+							"reload(mm)",
+							"mat = mm.Material('$(file_prefix)', True)",
+							"mat.clear()",
+							"Custom_0 = mat.add_node('Custom', -264, 80)",
+							"Custom_0.set_editor_property('code', mm.read_text_file('$(path_prefix).shader'))",
+							"Custom_0.set_editor_property('output_type', unreal.CustomMaterialOutputType.CMOT_FLOAT4)",
+							"Custom_0.set_editor_property('additional_outputs', [ mm.custom_output('metallic', 1), mm.custom_output('roughness', 1), mm.custom_output('normal', 3), mm.custom_output('emission', 3)])",
+							"inputs = [mm.custom_input('TexCoords'), mm.custom_input('Time')]",
+							"$begin_buffers",
+							"inputs.append(mm.custom_input('texture_$(buffer_index)'))",
+							"$end_buffers",
+							"Custom_0.set_editor_property('inputs', inputs)",
+							"TextureCoordinate_0 = mat.add_node('TextureCoordinate', -472, 80)",
+							"Time_0 = mat.add_node('Time', -456, 180)",
+							"$begin_buffers",
+							"Texture_$(buffer_index) = mat.add_node('TextureObject', -456, $(expr:110+170*$(buffer_index)))",
+							"Texture_$(buffer_index).set_editor_property('texture', mm.import_texture('$(path_prefix)_texture_$(buffer_index).png', '/Game/Textures'))",
+							"$end_buffers",
+							"mat.connect_property(Custom_0, 'return', unreal.MaterialProperty.MP_BASE_COLOR)",
+							"mat.connect_nodes(TextureCoordinate_0, '', Custom_0, 'TexCoords')",
+							"mat.connect_nodes(Time_0, '', Custom_0, 'Time')",
+							"$begin_buffers",
+							"mat.connect_nodes(Texture_$(buffer_index), '', Custom_0, 'texture_$(buffer_index)')",
+							"$end_buffers",
+							"mat.save()",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "$(path_prefix)_texture_$(buffer_index).png",
+						"type": "buffers"
+					},
+					{
+						"file_name": "$(path_prefix).shader",
+						"template": [
+							"struct Functions {",
+							"\tfloat Time;",
+							"$begin_buffers",
+							"\tTexture2D texture_$(buffer_index);",
+							"\tSamplerState texture_$(buffer_index)Sampler;",
+							"$end_buffers",
+							"\t",
+							"$definitions hlsl_base,rename_buffers,unreal5",
+							"\tfixed4 generated_shader(float2 uv, float _time",
+							"$begin_buffers",
+							"\t\t\t\t\t\t  , Texture2D _texture_$(buffer_index), SamplerState _texture_$(buffer_index)Sampler",
+							"$end_buffers",
+							"\t\t\t\t\t\t\t) {",
+							"\t\tfloat _seed_variation_ = 0.0;",
+							"\t\tfloat4 _controlled_variation_ = float4(0.0, 0.0, 0.0, 0.0);",
+							"\t\tTime = _time;",
+							"$begin_buffers",
+							"\t\ttexture_$(buffer_index) = _texture_$(buffer_index);",
+							"\t\ttexture_$(buffer_index)Sampler = _texture_$(buffer_index)Sampler;",
+							"$end_buffers",
+							"\t\t",
+							"$begin_generate hlsl_base,rename_buffers,unreal5",
+							"\t\t// sample the generated texture",
+							"\t\treturn $color_tex(uv);",
+							"$end_generate",
+							"\t}",
+							"};",
+							"Functions f;",
+							"return f.generated_shader(TexCoords, Time",
+							"$begin_buffers",
+							"\t\t\t\t\t\t\t\t  , texture_$(buffer_index), texture_$(buffer_index)Sampler",
+							"$end_buffers",
+							"\t\t\t\t\t\t\t\t   );",
+							""
+						],
+						"type": "template"
+					},
+					{
+						"file_name": "clipboard",
+						"template": [
+							"\"$(path_prefix).py\"",
+							""
+						],
+						"type": "template"
+					}
+				],
+				"material": "material_dynamic",
+				"name": "Unreal/Unreal Engine 5"
+			}
+		},
+		"global": "",
+		"inputs": [
+			{
+				"default": "vec4(1.0)",
+				"label": "",
+				"name": "color_tex",
+				"type": "rgba"
+			}
+		],
+		"instance": "",
+		"name": "Dynamic Unlit Material",
+		"outputs": [
+
+		],
+		"parameters": [
+			{
+				"default": 0,
+				"label": "Blend",
+				"name": "blend",
+				"type": "enum",
+				"values": [
+					{
+						"name": "Add",
+						"value": "add"
+					},
+					{
+						"name": "Mix",
+						"value": "mix"
+					},
+					{
+						"name": "Mul",
+						"value": "mul"
+					},
+					{
+						"name": "Sub",
+						"value": "sub"
+					}
+				]
+			}
+		],
+		"preview_shader": [
+			"shader_type spatial;",
+			"$begin_generate",
+			"render_mode unshaded, blend_$blend;",
+			"$end_generate",
+			"",
+			"uniform vec3 uv1_scale = vec3(1.0, 1.0, 1.0);",
+			"uniform vec3 uv1_offset = vec3(0.0, 0.0, 0.0);",
+			"uniform float variation = 0.0;",
+			"",
+			"varying float elapsed_time;",
+			"",
+			"void vertex() {",
+			"\telapsed_time = TIME;",
+			"\tUV = UV*uv1_scale.xy+uv1_offset.xy;",
+			"}",
+			"",
+			"$definitions",
+			"",
+			"void fragment() {",
+			"\tfloat _seed_variation_ = variation;",
+			"\tvec4 _controlled_variation_ = vec4(0.0);",
+			"\tvec2 uv = fract(UV);",
+			"$begin_generate",
+			"\tvec4 color_tex = $color_tex(uv);",
+			"\tcolor_tex = mix(pow((color_tex + vec4(0.055)) * (1.0 / (1.0 + 0.055)),vec4(2.4)),color_tex * (1.0 / 12.92),lessThan(color_tex,vec4(0.04045)));",
+			"\tALBEDO = color_tex.rgb;",
+			"\tALPHA = color_tex.a;",
+			"$end_generate",
+			"",
+			"}",
+			""
+		]
+	},
+	"type": "material_export"
+}

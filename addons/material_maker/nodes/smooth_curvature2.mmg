@@ -1,0 +1,385 @@
+{
+	"connections": [
+		{
+			"from": "gen_inputs",
+			"from_port": 0,
+			"to": "buffer",
+			"to_port": 0
+		},
+		{
+			"from": "buffer",
+			"from_port": 0,
+			"to": "switch",
+			"to_port": 1
+		},
+		{
+			"from": "gen_inputs",
+			"from_port": 0,
+			"to": "switch",
+			"to_port": 0
+		},
+		{
+			"from": "598",
+			"from_port": 0,
+			"to": "buffer_2",
+			"to_port": 0
+		},
+		{
+			"from": "buffer_2",
+			"from_port": 0,
+			"to": "switch_2",
+			"to_port": 1
+		},
+		{
+			"from": "598",
+			"from_port": 0,
+			"to": "switch_2",
+			"to_port": 0
+		},
+		{
+			"from": "switch_2",
+			"from_port": 0,
+			"to": "gen_outputs",
+			"to_port": 0
+		},
+		{
+			"from": "switch",
+			"from_port": 0,
+			"to": "598",
+			"to_port": 0
+		}
+	],
+	"label": "Smooth Curvature 2",
+	"longdesc": "",
+	"name": "smooth_curvature2",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"nodes": [
+		{
+			"name": "buffer",
+			"node_position": {
+				"x": 300.603302,
+				"y": -549.522034
+			},
+			"parameters": {
+				"lod": 0,
+				"size": 10
+			},
+			"seed": -31345,
+			"type": "buffer"
+		},
+		{
+			"name": "598",
+			"node_position": {
+				"x": 286.999847,
+				"y": -359.903259
+			},
+			"parameters": {
+				"quality": 4,
+				"radius": 1,
+				"strength": 1
+			},
+			"seed": -50629,
+			"shader_model": {
+				"code": "",
+				"global": "",
+				"inputs": [
+					{
+						"default": "0.5",
+						"function": true,
+						"label": "",
+						"name": "in",
+						"type": "f"
+					}
+				],
+				"instance": [
+					"float $(name)_curve( vec2 p, vec2 o ){",
+					"\tfloat a = $in(p+o);",
+					"\tfloat b = $in(p-o);",
+					"\tfloat c = $in(p+o*vec2(1.0,-1.0));",
+					"\tfloat d = $in(p-o*vec2(1.0,-1.0));",
+					"\treturn -a - b - c - d;",
+					"}",
+					"",
+					"float $(name)_curvature_map(vec2 p, float r, float q){",
+					"\tfloat s = r/q;",
+					"\tfloat H = $in(p)*4.0;",
+					"\tfloat v = 0.0;",
+					"\tfor(float ox = 0.0; ox < q; ox++ ){",
+					"\t\tfor(float oy = 0.0; oy < q; oy++ ){",
+					"\t\t\tvec2 o = vec2(ox, oy);",
+					"\t\t\tfloat c = $(name)_curve(p, o*s);",
+					"\t\t\tv += (H + c) * ((r-length(o*s)) / r);",
+					"\t\t}",
+					"\t}",
+					"\treturn v/(q*q);",
+					"}",
+					"",
+					"float $(name)_curvature(vec2 uv, float quality, float strength, float radius) {",
+					"\tfloat c = $(name)_curvature_map(uv, 0.050 * radius, quality)*strength / radius;",
+					"\treturn 0.5 + c;",
+					"}"
+				],
+				"name": "Smooth Curvature",
+				"outputs": [
+					{
+						"f": "$(name)_curvature($uv, $quality, $strength, $radius)",
+						"type": "f"
+					}
+				],
+				"parameters": [
+					{
+						"control": "None",
+						"default": 4,
+						"label": "Quality",
+						"longdesc": "How many times the input is sampled to generate the curvature map",
+						"max": 16,
+						"min": 2,
+						"name": "quality",
+						"shortdesc": "Quality",
+						"step": 1,
+						"type": "float"
+					},
+					{
+						"control": "None",
+						"default": 1,
+						"label": "Strength",
+						"longdesc": "The intensity of the curvature map",
+						"max": 2,
+						"min": 0,
+						"name": "strength",
+						"shortdesc": "Strength",
+						"step": 0.01,
+						"type": "float"
+					},
+					{
+						"control": "None",
+						"default": 1,
+						"label": "Radius",
+						"longdesc": "The radius of the smoothing of the curvature effect",
+						"max": 2,
+						"min": 0,
+						"name": "radius",
+						"shortdesc": "Radius",
+						"step": 0.01,
+						"type": "float"
+					}
+				],
+				"shortdesc": "Smooth Curvature"
+			},
+			"type": "shader"
+		},
+		{
+			"name": "gen_parameters",
+			"node_position": {
+				"x": 242.146149,
+				"y": -788.088806
+			},
+			"parameters": {
+				"param0": 10,
+				"param1": 4,
+				"param2": 1,
+				"param3": 1,
+				"param4": 1
+			},
+			"seed": -26718,
+			"type": "remote",
+			"widgets": [
+				{
+					"label": "Size",
+					"linked_widgets": [
+						{
+							"node": "buffer",
+							"widget": "size"
+						},
+						{
+							"node": "buffer_2",
+							"widget": "size"
+						}
+					],
+					"longdesc": "The resolution of the curvature map if buffer is used",
+					"name": "param0",
+					"shortdesc": "Size",
+					"type": "linked_control"
+				},
+				{
+					"label": "Quality",
+					"linked_widgets": [
+						{
+							"node": "598",
+							"widget": "quality"
+						}
+					],
+					"longdesc": "How many times the input is sampled to generate the curvature map",
+					"name": "param1",
+					"shortdesc": "Quality",
+					"type": "linked_control"
+				},
+				{
+					"label": "Strength",
+					"linked_widgets": [
+						{
+							"node": "598",
+							"widget": "strength"
+						}
+					],
+					"longdesc": "The intensity of the curvature map",
+					"name": "param2",
+					"shortdesc": "Strength",
+					"type": "linked_control"
+				},
+				{
+					"label": "Radius",
+					"linked_widgets": [
+						{
+							"node": "598",
+							"widget": "radius"
+						}
+					],
+					"longdesc": "The radius of the smoothing of the curvature effect",
+					"name": "param3",
+					"shortdesc": "Radius",
+					"type": "linked_control"
+				},
+				{
+					"configurations": {
+						"False": [
+							{
+								"node": "switch",
+								"value": 0,
+								"widget": "source"
+							},
+							{
+								"node": "switch_2",
+								"value": 0,
+								"widget": "source"
+							}
+						],
+						"True": [
+							{
+								"node": "switch",
+								"value": 1,
+								"widget": "source"
+							},
+							{
+								"node": "switch_2",
+								"value": 1,
+								"widget": "source"
+							}
+						]
+					},
+					"label": "Buffer",
+					"linked_widgets": [
+						{
+							"node": "switch",
+							"widget": "source"
+						},
+						{
+							"node": "switch_2",
+							"widget": "source"
+						}
+					],
+					"longdesc": "When set, a buffer is used to sample the input before the normal map filter",
+					"name": "param4",
+					"shortdesc": "Buffer",
+					"type": "config_control"
+				}
+			]
+		},
+		{
+			"name": "gen_inputs",
+			"node_position": {
+				"x": -135.453888,
+				"y": -518.927429
+			},
+			"parameters": {
+
+			},
+			"ports": [
+				{
+					"group_size": 0,
+					"longdesc": "The input height map",
+					"name": "Heightmap",
+					"shortdesc": "Input",
+					"type": "f"
+				}
+			],
+			"seed": 27485,
+			"type": "ios"
+		},
+		{
+			"name": "gen_outputs",
+			"node_position": {
+				"x": 586.203247,
+				"y": -534.919678
+			},
+			"parameters": {
+
+			},
+			"ports": [
+				{
+					"group_size": 0,
+					"longdesc": "Shows the generated curvature map",
+					"name": "Curvature",
+					"shortdesc": "Output",
+					"type": "f"
+				}
+			],
+			"seed": -16100,
+			"type": "ios"
+		},
+		{
+			"name": "switch",
+			"node_position": {
+				"x": 310.739746,
+				"y": -451.658417
+			},
+			"parameters": {
+				"choices": 2,
+				"outputs": 1,
+				"source": 1
+			},
+			"seed": -44617,
+			"type": "switch"
+		},
+		{
+			"name": "buffer_2",
+			"node_position": {
+				"x": 293.839874,
+				"y": -225.201691
+			},
+			"parameters": {
+				"lod": 0,
+				"size": 10
+			},
+			"seed": -40604,
+			"type": "buffer"
+		},
+		{
+			"name": "switch_2",
+			"node_position": {
+				"x": 312.239838,
+				"y": -129.465912
+			},
+			"parameters": {
+				"choices": 2,
+				"outputs": 1,
+				"source": 1
+			},
+			"seed": -60745,
+			"type": "switch"
+		},
+	],
+	"parameters": {
+		"param0": 10,
+		"param1": 4,
+		"param2": 1,
+		"param3": 1,
+		"param4": 1
+	},
+	"seed_int": 0,
+	"shortdesc": "Smooth Curvature",
+	"type": "graph"
+}

@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3 uid="uid://cp2mbbfmrv6sf"]
+
+[ext_resource type="Script" uid="uid://4ajg6j8vvfvo" path="res://material_maker/widgets/render_counter/render_counter.gd" id="1"]
+
+[node name="RenderCounter" type="HBoxContainer" groups=["render_counter"]]
+offset_right = 158.0
+offset_bottom = 20.0
+script = ExtResource("1")
+
+[node name="FpsCounter" type="Label" parent="."]
+layout_mode = 2
+
+[node name="GpuRam" type="Label" parent="."]
+layout_mode = 2
+mouse_filter = 0
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_vertical = 1
+mouse_filter = 2
+max_value = 1.0
+value = 1.0
+show_percentage = false
+
+[node name="Label" type="Label" parent="ProgressBar"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+
+[node name="Renderers" type="PopupMenu" parent="PopupMenu"]
+
+[node name="MaxRenderSize" type="PopupMenu" parent="PopupMenu"]
+
+[node name="MaxBufferSize" type="PopupMenu" parent="PopupMenu"]
+
+[node name="MemUpdateTimer" type="Timer" parent="."]
+autostart = true
+
+[connection signal="gui_input" from="." to="." method="_on_RenderCounter_gui_input"]
+[connection signal="id_pressed" from="PopupMenu" to="." method="_on_PopupMenu_id_pressed"]
+[connection signal="id_pressed" from="PopupMenu/Renderers" to="." method="_on_Renderers_id_pressed"]
+[connection signal="id_pressed" from="PopupMenu/MaxRenderSize" to="." method="_on_MaxRenderSize_id_pressed"]
+[connection signal="id_pressed" from="PopupMenu/MaxBufferSize" to="." method="_on_MaxBufferSize_id_pressed"]
+[connection signal="timeout" from="MemUpdateTimer" to="." method="_on_MemUpdateTimer_timeout"]

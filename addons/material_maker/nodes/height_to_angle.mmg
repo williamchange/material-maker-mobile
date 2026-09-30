@@ -1,0 +1,63 @@
+{
+	"name": "height_to_angle",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"angle": 0
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": "",
+		"global": "",
+		"inputs": [
+			{
+				"default": "0.0",
+				"function": true,
+				"label": "",
+				"longdesc": "The input heightmap (it is recommended to use a buffer)",
+				"name": "in",
+				"shortdesc": "Input",
+				"type": "f"
+			}
+		],
+		"instance": [
+			"float $(name)_fct(vec2 uv, float epsilon) {",
+			"\tvec3 e = vec3(epsilon, -epsilon, 0);",
+			"\tfloat start = $in(uv);",
+			"\tvec2 dh = vec2(1.0, 0.0)*$in(uv+e.xz);",
+			"\tdh += vec2(0.0, 1.0)*$in(uv+e.zx);",
+			"\tdh -= vec2(1.0, 0.0)*$in(uv-e.xz);",
+			"\tdh -= vec2(0.0, 1.0)*$in(uv-e.zx);",
+			"\treturn atan(dh.y, dh.x)/3.141592;",
+			"}"
+		],
+		"longdesc": "Generates an angle map to be used by Advances Tiler nodes from a heightmap",
+		"name": "Height to Angle",
+		"outputs": [
+			{
+				"f": "$(name)_fct($uv, 0.001)+$angle/180.0",
+				"longdesc": "The generated angle map. Values are between -1 and 1 and the corresponding Advanced Tiler parameter (Rotate) must be set to 180.",
+				"shortdesc": "Output",
+				"type": "f"
+			}
+		],
+		"parameters": [
+			{
+				"control": "None",
+				"default": 0,
+				"label": "",
+				"longdesc": "The offset angle applied to the generated map",
+				"max": 180,
+				"min": -180,
+				"name": "angle",
+				"shortdesc": "Angle",
+				"step": 0.01,
+				"type": "float"
+			}
+		],
+		"shortdesc": "Height to Angle"
+	},
+	"type": "shader"
+}

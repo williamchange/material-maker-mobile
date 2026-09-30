@@ -1,0 +1,530 @@
+[gd_scene format=3 uid="uid://bnqq3vhwmudkw"]
+
+[ext_resource type="Script" uid="uid://cryayuomvuwbo" path="res://material_maker/main_window_projects_panel.gd" id="1_m3usq"]
+[ext_resource type="PackedScene" uid="uid://bb6iar0tbj2qt" path="res://material_maker/panels/preview_2d/preview_2d.tscn" id="2_oiaqi"]
+[ext_resource type="PackedScene" uid="uid://dpaxvlnn2u1f6" path="res://material_maker/panels/preview_3d/preview_3d.tscn" id="3_qvj7k"]
+[ext_resource type="Script" uid="uid://bl15iwn2k8qm" path="res://material_maker/widgets/tabs/tabs.gd" id="4_mpinq"]
+[ext_resource type="Script" uid="uid://c37lcka7r53wk" path="res://material_maker/panels/common/menu_bar_button_with_panel.gd" id="6_r5hxx"]
+[ext_resource type="Script" uid="uid://jvurydhtpvc2" path="res://material_maker/panels/graph_edit/graph_zoom_menu.gd" id="7_lbgjg"]
+[ext_resource type="Script" uid="uid://bos2fu0tsood3" path="res://material_maker/panels/preview_2d/simple_button.gd" id="7_qnupl"]
+[ext_resource type="PackedScene" uid="uid://rflulhsuy3ax" path="res://material_maker/widgets/float_edit/float_edit.tscn" id="8_1w3oe"]
+[ext_resource type="Script" uid="uid://bxwor0k6svci8" path="res://material_maker/panels/graph_edit/graph_view_menu.gd" id="8_nl2qi"]
+[ext_resource type="Script" uid="uid://pqxjwlcff5ko" path="res://material_maker/panels/graph_edit/graph_align_menu.gd" id="8_r5hxx"]
+[ext_resource type="ButtonGroup" uid="uid://biv6we3po8wbb" path="res://material_maker/line_style_btn_group.tres" id="10_lbgjg"]
+
+[sub_resource type="Shader" id="Shader_r5hxx"]
+resource_local_to_scene = true
+code = "shader_type canvas_item;"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qnupl"]
+resource_local_to_scene = true
+shader = SubResource("Shader_r5hxx")
+
+[sub_resource type="InputEventKey" id="InputEventKey_r5hxx"]
+device = -1
+command_or_control_autoremap = true
+keycode = 45
+
+[sub_resource type="Shortcut" id="Shortcut_qnupl"]
+events = [SubResource("InputEventKey_r5hxx")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_qnupl"]
+device = -1
+command_or_control_autoremap = true
+keycode = 61
+
+[sub_resource type="Shortcut" id="Shortcut_uk6aw"]
+events = [SubResource("InputEventKey_qnupl")]
+
+[sub_resource type="InputEventKey" id="InputEventKey_lbgjg"]
+device = -1
+command_or_control_autoremap = true
+keycode = 93
+
+[sub_resource type="Shortcut" id="Shortcut_7tisq"]
+events = [SubResource("InputEventKey_lbgjg")]
+
+[node name="ProjectsPanel" type="Control" unique_id=235293066]
+clip_contents = true
+custom_minimum_size = Vector2(100, 100)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+size_flags_stretch_ratio = 3.0
+script = ExtResource("1_m3usq")
+metadata/_edit_vertical_guides_ = [-393.0]
+
+[node name="BackgroundPreviews" type="Control" parent="." unique_id=109433253]
+layout_mode = 1
+anchors_preset = 0
+offset_top = 28.0
+
+[node name="BackgroundPanel" type="Panel" parent="BackgroundPreviews" unique_id=1919486170]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"MM_ProjectsBackground"
+
+[node name="Preview2D" parent="BackgroundPreviews" unique_id=1300413402 instance=ExtResource("2_oiaqi")]
+visible = false
+material = SubResource("ShaderMaterial_qnupl")
+layout_mode = 1
+offset_right = 64.0
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 2
+shader = "uniform vec2 preview_2d_size = vec2(100.0, 100.0);
+const float preview_2d_scale = 1.2;
+const vec2 preview_2d_center = vec2(0.5);
+
+void fragment() {
+	vec2 ratio = preview_2d_size;
+	vec2 uv = preview_2d_center+(UV-0.5)*preview_2d_scale*ratio/min(ratio.x, ratio.y);
+	vec4 image = preview_2d(uv);
+	float checkerboard = mix(0.4, 0.6, mod(floor(uv.x*32.0)+floor(uv.y*32.0), 2.0));
+	vec3 image_with_background = mix(vec3(checkerboard), image.xyz, image.a);
+	COLOR = vec4(image_with_background, 1.0);
+}
+"
+
+[node name="Preview3D" parent="BackgroundPreviews" unique_id=772287010 instance=ExtResource("3_qvj7k")]
+visible = false
+layout_mode = 1
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Projects" type="Panel" parent="." unique_id=482476893]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 5.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("4_mpinq")
+
+[node name="TabBar" type="TabBar" parent="Projects" unique_id=1986217017]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+tab_close_display_policy = 2
+drag_to_rearrange_enabled = true
+
+[node name="CrashRecoveryTimer" type="Timer" parent="Projects" unique_id=2085979550]
+wait_time = 15.0
+autostart = true
+
+[node name="MenuBar" type="ScrollContainer" parent="." unique_id=332893364]
+unique_name_in_owner = true
+clip_contents = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_type_variation = &"MM_PanelMenuBackground"
+horizontal_scroll_mode = 3
+vertical_scroll_mode = 0
+
+[node name="HBox" type="HFlowContainer" parent="MenuBar" unique_id=1745648376]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="MainGraphMenuBar" type="PanelContainer" parent="MenuBar/HBox" unique_id=1975017102]
+layout_mode = 2
+size_flags_vertical = 0
+theme_type_variation = &"MM_PanelMenuBar"
+
+[node name="HBox" type="HBoxContainer" parent="MenuBar/HBox/MainGraphMenuBar" unique_id=1612198798]
+layout_mode = 2
+theme_type_variation = &"MM_PanelMenuBar"
+
+[node name="ZoomMenu" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox" unique_id=940224064]
+custom_minimum_size = Vector2(40, 25)
+layout_mode = 2
+tooltip_text = "Zoom"
+theme_type_variation = &"MM_PanelMenuButton"
+toggle_mode = true
+button_mask = 3
+script = ExtResource("6_r5hxx")
+icon_name = "zoom"
+
+[node name="ZoomeMenuPanel" type="PanelContainer" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu" unique_id=597538496]
+top_level = true
+layout_mode = 0
+offset_left = 283.0
+offset_top = -56.0
+offset_right = 391.0
+offset_bottom = -32.0
+theme_type_variation = &"MM_PanelMenuSubPanel"
+script = ExtResource("7_lbgjg")
+
+[node name="VBoxContainer" type="HBoxContainer" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel" unique_id=904447694]
+layout_mode = 2
+
+[node name="ZoomOut" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel/VBoxContainer" unique_id=1634117598]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Zoom Out"
+shortcut = SubResource("Shortcut_qnupl")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "zoom_out"
+
+[node name="ZoomIn" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel/VBoxContainer" unique_id=692399315]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Zoom In"
+shortcut = SubResource("Shortcut_uk6aw")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "zoom_in"
+
+[node name="ZoomReset" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel/VBoxContainer" unique_id=137595156]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Zoom Reset"
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "zoom_reset"
+
+[node name="ZoomLabel" type="Label" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel/VBoxContainer" unique_id=1679041083]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MM_NumberLabel"
+
+[node name="ViewMenu" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox" unique_id=193144060]
+custom_minimum_size = Vector2(40, 25)
+layout_mode = 2
+tooltip_text = "View"
+theme_type_variation = &"MM_PanelMenuButton"
+toggle_mode = true
+button_mask = 3
+script = ExtResource("6_r5hxx")
+icon_name = "view"
+
+[node name="ViewMenuPanel" type="PanelContainer" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu" unique_id=1063164635]
+top_level = true
+layout_mode = 0
+offset_left = 282.0
+offset_top = 85.0
+offset_right = 540.0
+offset_bottom = 219.0
+theme_type_variation = &"MM_PanelMenuSubPanel"
+script = ExtResource("8_nl2qi")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" unique_id=1145752631]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer" unique_id=906184498]
+layout_mode = 2
+
+[node name="GridVisibility" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer" unique_id=1517910422]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Grid Visiblity"
+toggle_mode = true
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "grid"
+
+[node name="GridSnapping" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer" unique_id=1138462314]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Grid Snapping"
+toggle_mode = true
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "snapping"
+
+[node name="GridSize" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer" unique_id=2132691985 instance=ExtResource("8_1w3oe")]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Grid Size"
+value = 20.0
+min_value = 10.0
+max_value = 40.0
+step = 1.0
+float_only = true
+
+[node name="Minimap" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer" unique_id=1930373083]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Minimap Visibility"
+toggle_mode = true
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "minimap"
+
+[node name="HSeparator" type="HSeparator" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer" unique_id=136343450]
+modulate = Color(1, 1, 1, 0.5)
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer" unique_id=88181435]
+layout_mode = 2
+
+[node name="DirectConnection" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2" unique_id=1847087790]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Direct Connections"
+tooltip_auto_translate_mode = 2
+toggle_mode = true
+button_group = ExtResource("10_lbgjg")
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "connection_direct"
+
+[node name="BezierConnection" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2" unique_id=1034636025]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Bezier Connections"
+tooltip_auto_translate_mode = 2
+toggle_mode = true
+button_pressed = true
+button_group = ExtResource("10_lbgjg")
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "connection_bezier"
+
+[node name="RoundedConnection" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2" unique_id=243663871]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Rounded Connections"
+tooltip_auto_translate_mode = 2
+toggle_mode = true
+button_group = ExtResource("10_lbgjg")
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "connection_rounded"
+
+[node name="ManhattanConnection" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2" unique_id=1816351360]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Manhattan Connections"
+tooltip_auto_translate_mode = 2
+toggle_mode = true
+button_group = ExtResource("10_lbgjg")
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "connection_manhattan"
+
+[node name="DiagonalConnection" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2" unique_id=1375146451]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Diagonal Connections"
+tooltip_auto_translate_mode = 2
+toggle_mode = true
+button_group = ExtResource("10_lbgjg")
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "connection_diagonal"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer" unique_id=1646022119]
+layout_mode = 2
+
+[node name="Thickness" type="HBoxContainer" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/VBoxContainer2" unique_id=54085519]
+layout_mode = 2
+
+[node name="ThicknessLabel" type="Label" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/VBoxContainer2/Thickness" unique_id=537020243]
+layout_mode = 2
+text = "Thickness"
+
+[node name="LineThickness" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/VBoxContainer2/Thickness" unique_id=688868721 instance=ExtResource("8_1w3oe")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Connection lines thickness"
+value = 4.0
+min_value = 1.0
+max_value = 12.0
+step = 0.01
+float_only = true
+
+[node name="Curvature" type="HBoxContainer" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/VBoxContainer2" unique_id=1505528355]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CurvatureLabel" type="Label" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/VBoxContainer2/Curvature" unique_id=1316641134]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Curvature"
+
+[node name="LineCurvature" parent="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/VBoxContainer2/Curvature" unique_id=1977695507 instance=ExtResource("8_1w3oe")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Connection lines curvature"
+max_value = 2.0
+step = 0.01
+float_only = true
+
+[node name="ArrangeNodes" type="Button" parent="MenuBar/HBox/MainGraphMenuBar/HBox" unique_id=160621023]
+visible = false
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Auto-Arrange Selected Nodes"
+tooltip_auto_translate_mode = 2
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "arrange_nodes"
+
+[node name="AlignMenu" type="PanelContainer" parent="MenuBar/HBox" unique_id=243111021]
+layout_mode = 2
+size_flags_vertical = 0
+theme_type_variation = &"MM_PanelMenuBar"
+script = ExtResource("8_r5hxx")
+
+[node name="HBox" type="HBoxContainer" parent="MenuBar/HBox/AlignMenu" unique_id=1761807902]
+layout_mode = 2
+theme_type_variation = &"MM_PanelMenuBar"
+
+[node name="AlignStart" type="Button" parent="MenuBar/HBox/AlignMenu/HBox" unique_id=880381229]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Align Start"
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "align_start"
+
+[node name="AlignCenter" type="Button" parent="MenuBar/HBox/AlignMenu/HBox" unique_id=1438300944]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Align Center"
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "align_center"
+
+[node name="AlignEnd" type="Button" parent="MenuBar/HBox/AlignMenu/HBox" unique_id=485807066]
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "Align End"
+shortcut = SubResource("Shortcut_7tisq")
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "align_end"
+
+[node name="PreviewsMenu" type="PanelContainer" parent="MenuBar/HBox" unique_id=1858302922]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+theme_type_variation = &"MM_PanelMenuBar"
+
+[node name="HBox" type="HBoxContainer" parent="MenuBar/HBox/PreviewsMenu" unique_id=1978081934]
+layout_mode = 2
+theme_type_variation = &"MM_PanelMenuBar"
+
+[node name="2DPreview" type="Button" parent="MenuBar/HBox/PreviewsMenu/HBox" unique_id=1542508369]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "2D Preview"
+toggle_mode = true
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "2D_preview"
+
+[node name="3DPreview" type="Button" parent="MenuBar/HBox/PreviewsMenu/HBox" unique_id=1992877361]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(25, 25)
+layout_mode = 2
+tooltip_text = "3D Preview"
+toggle_mode = true
+shortcut_in_tooltip = false
+icon_alignment = 1
+script = ExtResource("7_qnupl")
+icon_name = "3D_preview"
+
+[node name="ControlView" type="TextureRect" parent="MenuBar/HBox/PreviewsMenu/HBox" unique_id=1933136932]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Middle-Mouse click and drag to turn the 3D preview.
+
+Scroll to zoom the 3D Preview."
+
+[connection signal="resized" from="." to="." method="_on_projects_panel_resized"]
+[connection signal="no_more_tabs" from="Projects" to="." method="_on_projects_no_more_tabs"]
+[connection signal="resized" from="Projects" to="Projects" method="_on_Projects_resized"]
+[connection signal="tab_changed" from="Projects" to="." method="_on_projects_tab_changed"]
+[connection signal="tab_changed" from="Projects/TabBar" to="Projects" method="set_current_tab"]
+[connection signal="tab_close_pressed" from="Projects/TabBar" to="Projects" method="close_tab"]
+[connection signal="timeout" from="Projects/CrashRecoveryTimer" to="Projects" method="_on_CrashRecoveryTimer_timeout"]
+[connection signal="pressed" from="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel/VBoxContainer/ZoomOut" to="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel" method="_on_zoom_out_pressed"]
+[connection signal="pressed" from="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel/VBoxContainer/ZoomIn" to="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel" method="_on_zoom_in_pressed"]
+[connection signal="pressed" from="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel/VBoxContainer/ZoomReset" to="MenuBar/HBox/MainGraphMenuBar/HBox/ZoomMenu/ZoomeMenuPanel" method="_on_zoom_reset_pressed"]
+[connection signal="toggled" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer/GridVisibility" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_grid_visibility_toggled"]
+[connection signal="toggled" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer/GridSnapping" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_grid_snapping_toggled"]
+[connection signal="value_changed" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer/GridSize" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_grid_size_value_changed"]
+[connection signal="toggled" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer/Minimap" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_minimap_toggled"]
+[connection signal="toggled" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2/DirectConnection" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_direct_connection_toggled"]
+[connection signal="toggled" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2/BezierConnection" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_bezier_connection_toggled"]
+[connection signal="toggled" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2/RoundedConnection" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_rounded_connection_toggled"]
+[connection signal="toggled" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2/ManhattanConnection" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_manhattan_connection_toggled"]
+[connection signal="toggled" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/HBoxContainer2/DiagonalConnection" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_diagonal_connection_toggled"]
+[connection signal="value_changed" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/VBoxContainer2/Thickness/LineThickness" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_line_thickness_value_changed"]
+[connection signal="value_changed" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/VBoxContainer2/Curvature/LineCurvature" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu" method="_on_line_curvature_value_changed"]
+[connection signal="value_changed" from="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel/VBoxContainer/VBoxContainer2/Curvature/LineCurvature" to="MenuBar/HBox/MainGraphMenuBar/HBox/ViewMenu/ViewMenuPanel" method="_on_line_curvature_value_changed"]
+[connection signal="pressed" from="MenuBar/HBox/AlignMenu/HBox/AlignStart" to="MenuBar/HBox/AlignMenu" method="_on_align_start_pressed"]
+[connection signal="pressed" from="MenuBar/HBox/AlignMenu/HBox/AlignCenter" to="MenuBar/HBox/AlignMenu" method="_on_align_center_pressed"]
+[connection signal="pressed" from="MenuBar/HBox/AlignMenu/HBox/AlignEnd" to="MenuBar/HBox/AlignMenu" method="_on_align_end_pressed"]
+[connection signal="toggled" from="MenuBar/HBox/PreviewsMenu/HBox/2DPreview" to="." method="show_background_preview_2d"]
+[connection signal="toggled" from="MenuBar/HBox/PreviewsMenu/HBox/3DPreview" to="." method="show_background_preview_3d"]
+[connection signal="gui_input" from="MenuBar/HBox/PreviewsMenu/HBox/ControlView" to="BackgroundPreviews/Preview3D" method="on_gui_input"]

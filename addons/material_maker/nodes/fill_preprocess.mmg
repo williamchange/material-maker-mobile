@@ -1,0 +1,51 @@
+{
+	"name": "fill_preprocess",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"s": 8
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": "",
+		"global": [
+			"vec4 flood_fill_preprocess(vec2 uv, float c, float s) {",
+			"\tif (c > 0.5) {",
+			"\t\treturn vec4(0.0);",
+			"\t} else {",
+			"\t\treturn vec4(floor(uv*s)/s, vec2(1.0/s));",
+			"\t}",
+			"}"
+		],
+		"inputs": [
+			{
+				"default": "0.0",
+				"function": true,
+				"label": "",
+				"name": "in",
+				"type": "f"
+			}
+		],
+		"instance": "",
+		"name": "Fill preprocess",
+		"outputs": [
+			{
+				"rgba": "flood_fill_preprocess($uv, $in($uv), $s)",
+				"type": "rgba"
+			}
+		],
+		"parameters": [
+			{
+				"default": 10,
+				"first": 0,
+				"label": "",
+				"last": 12,
+				"name": "s",
+				"type": "size"
+			}
+		]
+	},
+	"type": "shader"
+}

@@ -1,0 +1,82 @@
+{
+	"name": "beehive2",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"sx": 4,
+		"sy": 4
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": [
+			"vec2 $(name_uv)_scale = vec2($sx, $sy*1.73205080757);",
+			"vec2 $(name_uv)_uv = $uv*$(name_uv)_scale;",
+			"vec4 $(name_uv)_center = beehive_center($(name_uv)_uv);",
+			"vec4 $(name_uv)_fill = fract(vec4($(name_uv)_uv-$(name_uv)_center.xy-vec2(0.5, 0.57735026919), vec2(1.0, 1.15470053838))/$(name_uv)_scale.xyxy);",
+			"$(name_uv)_fill = floor($(name_uv)_fill*16384.0)/16384.0;"
+		],
+		"global": [
+			"float beehive_dist(vec2 p){",
+			"\tvec2 s = vec2(1.0, 1.73205080757);",
+			"\tp = abs(p);",
+			"\treturn max(dot(p, s*.5), p.x);",
+			"}",
+			"",
+			"vec4 beehive_center(vec2 p) {",
+			"\tvec2 s = vec2(1.0, 1.73205080757);",
+			"\tvec4 hC = floor(vec4(p, p - vec2(.5, 1))/vec4(s,s)) + .5;",
+			"\tvec4 h = vec4(p - hC.xy*s, p - (hC.zw + .5)*s);",
+			"\treturn dot(h.xy, h.xy)<dot(h.zw, h.zw) ? vec4(h.xy, hC.xy) : vec4(h.zw, hC.zw + 9.73);",
+			"}",
+			""
+		],
+		"inputs": [],
+		"instance": "",
+		"longdesc": "Draws a grayscale hexagonal tiles pattern",
+		"name": "Beehive",
+		"outputs": [
+			{
+				"f": "1.0-2.0*beehive_dist($(name_uv)_center.xy)",
+				"longdesc": "Shows the grayscale pattern",
+				"shortdesc": "Output",
+				"type": "f"
+			},
+			{
+				"fill": "$(name_uv)_fill",
+				"longdesc": "An output that should be plugged into a Fill companion node",
+				"shortdesc": "Fill",
+				"type": "fill"
+			}
+		],
+		"parameters": [
+			{
+				"control": "None",
+				"default": 2,
+				"label": "Size X",
+				"longdesc": "The number of columns of the pattern",
+				"max": 64,
+				"min": 1,
+				"name": "sx",
+				"shortdesc": "Size.x",
+				"step": 1,
+				"type": "float"
+			},
+			{
+				"control": "None",
+				"default": 2,
+				"label": "Size Y",
+				"longdesc": "The number of rows of the pattern",
+				"max": 64,
+				"min": 1,
+				"name": "sy",
+				"shortdesc": "Size.y",
+				"step": 1,
+				"type": "float"
+			}
+		],
+		"shortdesc": "Hexagonal tiles pattern"
+	},
+	"type": "shader"
+}

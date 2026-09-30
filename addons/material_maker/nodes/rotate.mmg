@@ -1,0 +1,86 @@
+{
+	"generic_size": 1,
+	"name": "rotate",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"cx": 0,
+		"cy": 0,
+		"rotate": 0
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": "vec2 $(name_uv)_c = vec2(0.5+$cx, 0.5+$cy);",
+		"global": [
+			"vec2 rotate(vec2 uv, float rotate) {",
+			" \tvec2 rv;",
+			"\trv.x = cos(rotate)*uv.x + sin(rotate)*uv.y;",
+			"\trv.y = -sin(rotate)*uv.x + cos(rotate)*uv.y;",
+			"\treturn rv;\t",
+			"}"
+		],
+		"inputs": [
+			{
+				"default": "vec4($uv, 0.0, 1.0)",
+				"label": "",
+				"longdesc": "An input image",
+				"name": "i#",
+				"shortdesc": "Input#",
+				"type": "rgba"
+			}
+		],
+		"instance": "",
+		"longdesc": "Rotates its input",
+		"name": "Rotate",
+		"outputs": [
+			{
+				"longdesc": "Shows a rotated image",
+				"rgba": "$i#(rotate($uv-$(name_uv)_c, $rotate*0.01745329251)+$(name_uv)_c)",
+				"shortdesc": "Output#",
+				"type": "rgba"
+			}
+		],
+		"parameters": [
+			{
+				"control": "P1.x",
+				"default": 0,
+				"label": "Center X",
+				"longdesc": "The position of the rotation center",
+				"max": 1,
+				"min": -1,
+				"name": "cx",
+				"shortdesc": "Center.x",
+				"step": 0.005,
+				"type": "float"
+			},
+			{
+				"control": "P1.y",
+				"default": 0,
+				"label": "Center Y",
+				"longdesc": "The position of the rotation center",
+				"max": 1,
+				"min": -1,
+				"name": "cy",
+				"shortdesc": "Center.y",
+				"step": 0.005,
+				"type": "float"
+			},
+			{
+				"control": "Radius1.a",
+				"default": 0,
+				"label": "Rotate",
+				"longdesc": "The angle of the rotation",
+				"max": 720,
+				"min": -720,
+				"name": "rotate",
+				"shortdesc": "Angle",
+				"step": 0.005,
+				"type": "float"
+			}
+		],
+		"shortdesc": "Rotate"
+	},
+	"type": "shader"
+}

@@ -1,0 +1,64 @@
+{
+	"generic_size": 1,
+	"name": "sdrotate",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"parameters": {
+		"a": 0
+	},
+	"seed_int": 0,
+	"shader_model": {
+		"code": "",
+		"global": [
+			"vec2 sdf2d_rotate(vec2 uv, float a) {",
+			"\tvec2 rv;",
+			"\tfloat c = cos(a);",
+			"\tfloat s = sin(a);",
+			"\tuv -= vec2(0.5);",
+			"\trv.x = uv.x*c+uv.y*s;",
+			"\trv.y = -uv.x*s+uv.y*c;",
+			"\treturn rv+vec2(0.5);",
+			"}",
+			""
+		],
+		"inputs": [
+			{
+				"default": "0.0",
+				"label": "",
+				"longdesc": "The input shape, defined as a signed distance function",
+				"name": "in#",
+				"shortdesc": "Input#",
+				"type": "sdf2d"
+			}
+		],
+		"instance": "",
+		"longdesc": "Rotates its input shape described as a signed distance function",
+		"name": "Rotate",
+		"outputs": [
+			{
+				"longdesc": "The rotated shape",
+				"sdf2d": "$in#(sdf2d_rotate($uv, $a*0.01745329251))",
+				"shortdesc": "Output#",
+				"type": "sdf2d"
+			}
+		],
+		"parameters": [
+			{
+				"control": "Radius1.a",
+				"default": 0,
+				"label": "",
+				"longdesc": "The rotation angle",
+				"max": 180,
+				"min": -180,
+				"name": "a",
+				"shortdesc": "Angle",
+				"step": 1,
+				"type": "float"
+			}
+		],
+		"shortdesc": "sdRotate"
+	},
+	"type": "shader"
+}

@@ -1,0 +1,19 @@
+[gd_scene load_steps=5 format=3 uid="uid://bvqlgi1dn3we2"]
+
+[ext_resource type="PackedScene" uid="uid://bb6iar0tbj2qt" path="res://material_maker/panels/preview_2d/preview_2d.tscn" id="1"]
+[ext_resource type="Script" uid="uid://iq8300wfef4c" path="res://material_maker/panels/preview_2d/preview_2d_node.gd" id="2"]
+
+[sub_resource type="Shader" id="1"]
+resource_local_to_scene = true
+code = "shader_type canvas_item;"
+
+[sub_resource type="ShaderMaterial" id="2"]
+resource_local_to_scene = true
+shader = SubResource("1")
+
+[node name="Preview2D" instance=ExtResource("1")]
+material = SubResource("2")
+mouse_filter = 0
+script = ExtResource("2")
+
+[connection signal="gui_input" from="." to="." method="_on_gui_input"]

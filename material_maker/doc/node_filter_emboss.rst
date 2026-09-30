@@ -1,0 +1,45 @@
+Emboss node
+~~~~~~~~~~~
+
+The **Emboss** node generates an image that simulates lighting on its input.
+
+.. image:: images/node_filter_emboss.png
+	:align: center
+
+Inputs
+++++++
+
+The **Emboss** node has a single grayscale input, interpreted as a heightmap.
+
+Outputs
++++++++
+
+The **Emboss** node outputs the result of the emboss operation.
+
+Parameters
+++++++++++
+
+The **Emboss** node the following parameters:
+
+* The *grid size* defines the size of the output image.
+
+* the *angle* of the light source used for the emboss effect.
+
+* the *amount* defines the strength of the emboss effect.
+
+* the *width* of the emboss effect.
+
+* whether *32 Bit* buffer(s) are used to sample the input.
+  Reduces banding artifacts but could result in higher video
+  memory usage.
+
+Notes
++++++
+
+This node outputs an image that has a fixed size.
+
+Example images
+++++++++++++++
+
+.. image:: images/node_emboss_samples.png
+	:align: center

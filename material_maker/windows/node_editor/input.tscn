@@ -1,0 +1,85 @@
+[gd_scene load_steps=10 format=3 uid="uid://bc5kmhrysy8cn"]
+
+[ext_resource type="Script" uid="uid://codatbokkaf55" path="res://material_maker/windows/node_editor/input.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://c0j4px4n72di5" path="res://material_maker/icons/icons.tres" id="2"]
+[ext_resource type="PackedScene" uid="uid://bi88rsdxt0ld7" path="res://material_maker/widgets/port_group_button/port_group_button.tscn" id="3"]
+[ext_resource type="PackedScene" uid="uid://buj231c2gxm4o" path="res://material_maker/widgets/desc_button/desc_button.tscn" id="4"]
+[ext_resource type="Texture2D" uid="uid://1s0c37uoj4rf" path="res://material_maker/theme/default_theme_icons.svg" id="4_r3lle"]
+
+[sub_resource type="AtlasTexture" id="1"]
+atlas = ExtResource("2")
+region = Rect2(0, 16, 16, 16)
+
+[sub_resource type="AtlasTexture" id="2"]
+atlas = ExtResource("2")
+region = Rect2(18, 48, 12, 16)
+
+[sub_resource type="AtlasTexture" id="3"]
+atlas = ExtResource("2")
+region = Rect2(34, 48, 12, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ssp1q"]
+atlas = ExtResource("4_r3lle")
+region = Rect2(112, 128, 16, 16)
+
+[node name="Parameter" type="HBoxContainer"]
+offset_right = 201.0
+offset_bottom = 24.0
+script = ExtResource("1")
+
+[node name="Delete" type="Button" parent="."]
+layout_mode = 2
+icon = SubResource("1")
+flat = true
+
+[node name="Up" type="Button" parent="."]
+layout_mode = 2
+icon = SubResource("2")
+flat = true
+
+[node name="Down" type="Button" parent="."]
+layout_mode = 2
+icon = SubResource("3")
+flat = true
+
+[node name="Name" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+tooltip_text = "Input name"
+text = "name"
+
+[node name="Label" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+tooltip_text = "Input Label"
+text = "Label"
+
+[node name="Description" parent="." instance=ExtResource("4")]
+layout_mode = 2
+description_type = "Input"
+
+[node name="Type" type="OptionButton" parent="."]
+custom_minimum_size = Vector2(102, 0)
+layout_mode = 2
+tooltip_text = "Input flag"
+
+[node name="Default" type="LineEdit" parent="."]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+tooltip_text = "Default value"
+text = "0.0"
+
+[node name="Function" type="Button" parent="."]
+layout_mode = 2
+tooltip_text = "Generate input as function (can be used in \"Instance Functions\" section)"
+toggle_mode = true
+icon = SubResource("AtlasTexture_ssp1q")
+
+[node name="PortGroupButton" parent="." instance=ExtResource("3")]
+layout_mode = 2
+stretch_mode = 4
+
+[connection signal="pressed" from="Delete" to="." method="_on_Delete_pressed"]
+[connection signal="pressed" from="Up" to="." method="_on_Up_pressed"]
+[connection signal="pressed" from="Down" to="." method="_on_Down_pressed"]

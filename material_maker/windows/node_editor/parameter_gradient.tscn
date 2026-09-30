@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://c6pc6upxc23kc"]
+
+[ext_resource type="Script" path="res://material_maker/windows/node_editor/parameter_gradient.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://cp6ft7qbucfam" path="res://material_maker/widgets/gradient_editor/gradient_edit.tscn" id="2_v2daf"]
+
+[node name="gradient" type="HBoxContainer"]
+offset_right = 148.0
+offset_bottom = 24.0
+script = ExtResource("1")
+
+[node name="LabelDefault" type="Label" parent="."]
+layout_mode = 2
+text = "Default:"
+
+[node name="Default" parent="." instance=ExtResource("2_v2daf")]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2

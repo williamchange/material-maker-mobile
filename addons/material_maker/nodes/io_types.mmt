@@ -1,0 +1,121 @@
+[
+    {
+        "name":"f",
+        "label":"Grayscale",
+        "type":"float",
+        "paramdefs":"vec2 uv",
+        "params":"uv",
+        "slot_type":0,
+		"convert":[
+			{ "type":"rgb", "expr":"vec3($(value))" },
+			{ "type":"rgba", "expr":"vec4(vec3($(value)), 1.0)" }
+		],
+        "color":"#8D8D8D",
+    },
+    {
+        "name":"rgb",
+        "label":"Color",
+        "type":"vec3",
+        "paramdefs":"vec2 uv",
+        "params":"uv",
+        "slot_type":0,
+		"convert":[
+			{ "type":"f", "expr":"(dot($(value), vec3(1.0))/3.0)" },
+			{ "type":"rgba", "expr":"vec4($(value), 1.0)" }
+		],
+        "color":"#33A3C7",
+    },
+    {
+        "name":"rgba",
+        "label":"RGBA",
+        "type":"vec4",
+        "paramdefs":"vec2 uv",
+        "params":"uv",
+        "slot_type":0,
+		"convert":[
+			{ "type":"f", "expr":"(dot(($(value)).rgb, vec3(1.0))/3.0)" },
+			{ "type":"rgb", "expr":"(($(value)).rgb)" }
+		],
+        "color":"#335DC7",
+    },
+    {
+        "name":"sdf2d",
+        "label":"SDF2D",
+        "type":"float",
+        "paramdefs":"vec2 uv",
+        "params":"uv",
+        "slot_type":1,
+        "color":"#E8A31D",
+    },
+    {
+        "name":"sdf3d",
+        "label":"SDF3D",
+        "type":"float",
+        "paramdefs":"vec3 p",
+        "params":"p",
+        "slot_type":2,
+		"convert":[
+			{ "type":"sdf3dc", "expr":"vec2($(value), 0.0)" }
+		],
+        "color":"#EB6135",
+    },
+    {
+        "name":"sdf3dc",
+        "label":"SDF3D-C",
+        "type":"vec2",
+        "paramdefs":"vec3 p",
+        "params":"p",
+        "slot_type":2,
+		"convert":[
+			{ "type":"sdf3d", "expr":"($(value)).x" }
+		],
+        "color":"#DF2626",
+    },
+	{
+        "name":"tex3d_gs",
+        "label":"Grayscale TEX3D",
+        "type":"float",
+        "paramdefs":"vec4 p",
+        "params":"p",
+        "slot_type":3,
+        "convert":[
+			{ "type":"tex3d", "expr":"vec3($(value))" }
+		],
+        "color":"#A734DD",
+    },
+	{
+        "name":"tex3d",
+        "label":"TEX3D",
+        "type":"vec3",
+        "paramdefs":"vec4 p",
+        "params":"p",
+        "slot_type":3,
+		"convert":[
+			{ "type":"tex3d_gs", "expr":"(dot($(value), vec3(1.0))/3.0)" }
+		],
+        "color":"#E739D5",
+    },
+	{
+        "name":"v4v4",
+        "label":"V4->V4",
+        "type":"vec4",
+        "paramdefs":"vec4 p",
+        "params":"p",
+        "slot_type":4,
+        "color":"#B79074",
+    },
+    {
+        "name":"fill",
+        "label":"Fill",
+        "type":"vec4",
+        "paramdefs":"vec2 uv",
+        "params":"uv",
+        "slot_type":5,
+        "color":"#2DB76C",
+    },
+    {
+        "name":"any",
+        "slot_type":42,
+        "color":"#DEDEDE",
+    }
+]

@@ -1,0 +1,335 @@
+{
+	"connections": [
+		{
+			"from": "gen_inputs",
+			"from_port": 0,
+			"to": "buffer_5",
+			"to_port": 0
+		},
+		{
+			"from": "voronoi_2",
+			"from_port": 0,
+			"to": "buffer_7",
+			"to_port": 0
+		},
+		{
+			"from": "buffer_7",
+			"from_port": 0,
+			"to": "gen_outputs",
+			"to_port": 0
+		},
+		{
+			"from": "buffer_5",
+			"from_port": 0,
+			"to": "voronoi_2",
+			"to_port": 0
+		}
+	],
+	"label": "Denoiser",
+	"longdesc": "Fast spatial deNoise filter, with circular gaussian kernel.",
+	"name": "denoiser",
+	"node_position": {
+		"x": 0,
+		"y": 0
+	},
+	"nodes": [
+		{
+			"name": "buffer_5",
+			"node_position": {
+				"x": -1020.449646,
+				"y": -728.330017
+			},
+			"parameters": {
+				"size": 10
+			},
+			"seed": 64852,
+			"type": "buffer",
+			"version": 1
+		},
+		{
+			"name": "voronoi_2",
+			"node_position": {
+				"x": -969.111145,
+				"y": -629.459534
+			},
+			"parameters": {
+				"ksigma": 4,
+				"sigma": 3,
+				"size": 10,
+				"threshold": 0.7
+			},
+			"seed": 52770,
+			"shader_model": {
+				"code": "",
+				"global": "",
+				"inputs": [
+					{
+						"default": "0.0",
+						"function": true,
+						"label": "",
+						"name": "in",
+						"type": "rgba"
+					}
+				],
+				"instance": [
+					"//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+					"//  Copyright (c) 2018-2019 Michele Morrone",
+					"//  All rights reserved.",
+					"//",
+					"//  https://michelemorrone.eu - https://BrutPitt.com",
+					"//",
+					"//  me@michelemorrone.eu - brutpitt@gmail.com",
+					"//  twitter: @BrutPitt - github: BrutPitt",
+					"//  ",
+					"//  https://github.com/BrutPitt/glslSmartDeNoise/",
+					"//",
+					"//  This software is distributed under the terms of the BSD 2-Clause license",
+					"//  Adapted for Material Maker by wojtekpil",
+					"//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+					"//  smartDeNoise - parameters",
+					"//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~",
+					"//",
+					"//  sampler2D tex\t - sampler image / texture",
+					"//  vec2 uv\t\t   - actual fragment coord",
+					"//  float sigma  >  0 - sigma Standard Deviation",
+					"//  float kSigma >= 0 - sigma coefficient ",
+					"//\t  kSigma * sigma  -->  radius of the circular kernel",
+					"//  float threshold   - edge sharpening threshold ",
+					"vec4 $(name)_smartDeNoise(vec2 uv, float sigma, float kSigma, float threshold)",
+					"{",
+					"\tfloat INV_SQRT_OF_2PI = 0.39894228040143267793994605993439; // 1.0/SQRT_OF_2PI",
+					"\tfloat INV_PI = 0.31830988618379067153776752674503;",
+					"\tfloat radius = round(kSigma*sigma);",
+					"\tfloat radQ = radius * radius;",
+					"",
+					"\tfloat invSigmaQx2 = .5 / (sigma * sigma);\t  // 1.0 / (sigma^2 * 2.0)",
+					"\tfloat invSigmaQx2PI = INV_PI * invSigmaQx2;\t// 1/(2 * PI * sigma^2)",
+					"",
+					"\tfloat invThresholdSqx2 = .5 / (threshold * threshold);\t // 1.0 / (sigma^2 * 2.0)",
+					"\tfloat invThresholdSqrt2PI = INV_SQRT_OF_2PI / threshold;   // 1.0 / (sqrt(2*PI) * sigma^2)",
+					"",
+					"\tvec4 centrPx = $in(uv); ",
+					"",
+					"\tfloat zBuff = 0.0;",
+					"\tvec4 aBuff = vec4(0.0);",
+					"\tvec2 size = vec2($size, $size);",
+					"",
+					"\tvec2 d;",
+					"\tfor (d.x=-radius; d.x <= radius; d.x++) {",
+					"\t\tfloat pt = sqrt(radQ-d.x*d.x);\t   // pt = yRadius: have circular trend",
+					"\t\tfor (d.y=-pt; d.y <= pt; d.y++) {",
+					"\t\t\tfloat blurFactor = exp( -dot(d , d) * invSigmaQx2 ) * invSigmaQx2PI;",
+					"",
+					"\t\t\tvec4 walkPx =  $in(uv+d/size);",
+					"\t\t\tvec4 dC = walkPx-centrPx;",
+					"\t\t\tfloat deltaFactor = exp( -dot(dC, dC) * invThresholdSqx2) * invThresholdSqrt2PI * blurFactor;",
+					"",
+					"\t\t\tzBuff += deltaFactor;",
+					"\t\t\taBuff += deltaFactor*walkPx;",
+					"\t\t}",
+					"\t}",
+					"\treturn aBuff/zBuff;",
+					"}"
+				],
+				"longdesc": "Fast spatial deNoise filter, with circular gaussian kernel.",
+				"name": "Denoiser",
+				"outputs": [
+					{
+						"longdesc": "A color pattern that assigns a random color to each cell",
+						"rgba": "$(name)_smartDeNoise($uv, $sigma, $ksigma, $threshold)",
+						"shortdesc": "Random color",
+						"type": "rgba"
+					}
+				],
+				"parameters": [
+					{
+						"default": 10,
+						"first": 0,
+						"label": "Size",
+						"last": 12,
+						"longdesc": "The resolution of the denoiser",
+						"name": "size",
+						"type": "size"
+					},
+					{
+						"control": "None",
+						"default": 0.5,
+						"label": "Sigma",
+						"longdesc": "Standard Deviation sigma radius",
+						"max": 1,
+						"min": 0.005,
+						"name": "sigma",
+						"shortdesc": "Sigma",
+						"step": 0.1,
+						"type": "float"
+					},
+					{
+						"control": "None",
+						"default": 0.5,
+						"label": "kSigma",
+						"longdesc": "K factor sigma coefficient.\nkSigma = 1*sigma cover 68% of data\nkSigma = 2*sigma cover 95% of data - but there are over 3 times more points to compute\nkSigma = 3*sigma cover 99.7% of data - but needs more than double the calculations of 2*sigma",
+						"max": 1,
+						"min": 0,
+						"name": "ksigma",
+						"shortdesc": "kSigma",
+						"step": 0.1,
+						"type": "float"
+					},
+					{
+						"control": "None",
+						"default": 0.5,
+						"label": "Sharpening",
+						"longdesc": "Edge sharpening threshold",
+						"max": 1,
+						"min": 0,
+						"name": "threshold",
+						"shortdesc": "Sharpening",
+						"step": 0.1,
+						"type": "float"
+					}
+				],
+				"shortdesc": "Denoiser"
+			},
+			"type": "shader"
+		},
+		{
+			"name": "buffer_7",
+			"node_position": {
+				"x": -948.36377,
+				"y": -449.796295
+			},
+			"parameters": {
+				"size": 10
+			},
+			"seed": 16139,
+			"type": "buffer",
+			"version": 1
+		},
+		{
+			"name": "gen_inputs",
+			"node_position": {
+				"x": -1474.449707,
+				"y": -621.861938
+			},
+			"parameters": {
+
+			},
+			"ports": [
+				{
+					"group_size": 0,
+					"longdesc": "The input image to be denoised",
+					"name": "Input",
+					"shortdesc": "Input",
+					"type": "rgba"
+				}
+			],
+			"seed": 12817,
+			"type": "ios"
+		},
+		{
+			"name": "gen_outputs",
+			"node_position": {
+				"x": -559.111145,
+				"y": -597.861938
+			},
+			"parameters": {
+
+			},
+			"ports": [
+				{
+					"group_size": 0,
+					"name": "Output",
+					"type": "rgba"
+				}
+			],
+			"seed": 63204,
+			"type": "ios"
+		},
+		{
+			"name": "gen_parameters",
+			"node_position": {
+				"x": -1349.974854,
+				"y": -954.330078
+			},
+			"parameters": {
+				"param0": 10,
+				"param1": 3,
+				"param2": 4,
+				"param3": 0.7
+			},
+			"seed": 64995,
+			"type": "remote",
+			"widgets": [
+				{
+					"label": "Size",
+					"linked_widgets": [
+						{
+							"node": "buffer_5",
+							"widget": "size"
+						},
+						{
+							"node": "voronoi_2",
+							"widget": "size"
+						},
+						{
+							"node": "buffer_7",
+							"widget": "size"
+						}
+					],
+					"longdesc": "The resolution of the denoiser",
+					"name": "param0",
+					"shortdesc": "Size",
+					"type": "linked_control"
+				},
+				{
+					"label": "Sigma",
+					"linked_widgets": [
+						{
+							"node": "voronoi_2",
+							"widget": "sigma"
+						}
+					],
+					"longdesc": "Standard Deviation sigma radius",
+					"name": "param1",
+					"shortdesc": "Sigma",
+					"type": "linked_control"
+				},
+				{
+					"label": "kSigma",
+					"linked_widgets": [
+						{
+							"node": "voronoi_2",
+							"widget": "ksigma"
+						}
+					],
+					"longdesc": "K factor sigma coefficient.\nkSigma = 1*sigma cover 68% of data\nkSigma = 2*sigma cover 95% of data - but there are over 3 times more points to compute\nkSigma = 3*sigma cover 99.7% of data - but needs more than double the calculations of 2*sigma",
+					"name": "param2",
+					"shortdesc": "kSigma",
+					"type": "linked_control"
+				},
+				{
+					"label": "Sharpening",
+					"linked_widgets": [
+						{
+							"node": "voronoi_2",
+							"widget": "threshold"
+						}
+					],
+					"longdesc": "Edge sharpening threshold",
+					"name": "param3",
+					"shortdesc": "Sharpening",
+					"type": "linked_control"
+				}
+			]
+		}
+	],
+	"parameters": {
+		"param0": 10,
+		"param1": 3,
+		"param2": 4,
+		"param3": 0.7
+	},
+	"seed_int": 0,
+	"shortdesc": "Denoiser",
+	"type": "graph"
+}

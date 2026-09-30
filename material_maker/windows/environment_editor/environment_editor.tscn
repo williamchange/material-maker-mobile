@@ -1,0 +1,194 @@
+[gd_scene load_steps=4 format=3 uid="uid://dwr4qxlm6ebuc"]
+
+[ext_resource type="PackedScene" uid="uid://bb76ty33yvxj2" path="res://material_maker/windows/environment_editor/environment_editor_viewport.tscn" id="1"]
+[ext_resource type="Script" uid="uid://qvs2b46to53o" path="res://material_maker/windows/environment_editor/environment_editor.gd" id="2"]
+[ext_resource type="PackedScene" uid="uid://rflulhsuy3ax" path="res://material_maker/widgets/float_edit/float_edit.tscn" id="3"]
+
+[node name="EnvironmentEditor" type="Window"]
+oversampling_override = 1.0
+position = Vector2i(0, 36)
+exclusive = true
+script = ExtResource("2")
+
+[node name="Main" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(800, 500)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = -6.0
+offset_bottom = -6.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HSplitContainer" type="HBoxContainer" parent="Main"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Environments" type="ItemList" parent="Main/HSplitContainer"]
+custom_minimum_size = Vector2(112, 100)
+layout_mode = 2
+auto_width = true
+same_column_width = true
+fixed_column_width = 96
+icon_mode = 0
+
+[node name="ContextMenu" type="PopupMenu" parent="Main/HSplitContainer/Environments"]
+item_count = 1
+item_0/text = "Delete environment"
+item_0/id = 0
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="Main/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+stretch = true
+
+[node name="SubViewport" parent="Main/HSplitContainer/SubViewportContainer" instance=ExtResource("1")]
+size = Vector2i(2, 2)
+render_target_update_mode = 4
+
+[node name="UI" type="GridContainer" parent="Main/HSplitContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+mouse_filter = 2
+columns = 2
+
+[node name="NameLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Name:"
+
+[node name="name" type="LineEdit" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HdriUrlLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "HDRI URL:"
+
+[node name="hdri_url" type="LineEdit" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="show_color" type="CheckBox" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Color:"
+
+[node name="color" type="ColorPickerButton" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SkyEnergyLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Sky Energy:"
+
+[node name="sky_energy" parent="Main/HSplitContainer/UI" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 1.0
+max_value = 16.0
+step = 0.1
+float_only = true
+
+[node name="AmbientLightLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Ambient Color:"
+
+[node name="ambient_light_color" type="ColorPickerButton" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AmbientLightEnergyLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Ambient Energy:"
+
+[node name="ambient_light_energy" parent="Main/HSplitContainer/UI" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 1.0
+max_value = 16.0
+step = 0.1
+float_only = true
+
+[node name="AmbientLightSkyContributionLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Sky Contribution:"
+
+[node name="ambient_light_sky_contribution" parent="Main/HSplitContainer/UI" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 1.0
+step = 0.01
+float_only = true
+
+[node name="SunLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Sun Color:"
+
+[node name="sun_color" type="ColorPickerButton" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SunEnergyLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Sun Energy:"
+
+[node name="sun_energy" parent="Main/HSplitContainer/UI" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 1.0
+max_value = 16.0
+step = 0.1
+float_only = true
+
+[node name="SunDirectionLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Sun Direction:"
+
+[node name="sun_direction" parent="Main/HSplitContainer/UI" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 0.0
+min_value = -180.0
+max_value = 180.0
+step = 0.1
+float_only = true
+
+[node name="SunAngleLabel" type="Label" parent="Main/HSplitContainer/UI"]
+layout_mode = 2
+text = "Sun Angle:"
+
+[node name="sun_angle" parent="Main/HSplitContainer/UI" instance=ExtResource("3")]
+layout_mode = 2
+size_flags_horizontal = 3
+value = 0.0
+min_value = -90.0
+max_value = 90.0
+step = 0.1
+float_only = true
+
+[node name="Buttons" type="HBoxContainer" parent="Main"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Download" type="Button" parent="Main/Buttons"]
+layout_mode = 2
+text = "Download environment"
+
+[node name="Share" type="Button" parent="Main/Buttons"]
+layout_mode = 2
+text = "Upload environment"
+
+[node name="Close" type="Button" parent="Main/Buttons"]
+layout_mode = 2
+text = "Close"
+
+[connection signal="close_requested" from="." to="." method="queue_free"]
+[connection signal="minimum_size_changed" from="Main" to="." method="_on_Main_minimum_size_changed"]
+[connection signal="gui_input" from="Main/HSplitContainer/Environments" to="." method="_on_Environments_gui_input"]
+[connection signal="item_selected" from="Main/HSplitContainer/Environments" to="." method="_on_Environments_item_selected"]
+[connection signal="id_pressed" from="Main/HSplitContainer/Environments/ContextMenu" to="." method="_on_ContextMenu_id_pressed"]
+[connection signal="gui_input" from="Main/HSplitContainer/SubViewportContainer" to="." method="_on_ViewportContainer_gui_input"]
+[connection signal="pressed" from="Main/Buttons/Download" to="." method="_on_Download_pressed"]
+[connection signal="pressed" from="Main/Buttons/Share" to="." method="_on_Share_pressed"]
+[connection signal="pressed" from="Main/Buttons/Close" to="." method="queue_free"]
