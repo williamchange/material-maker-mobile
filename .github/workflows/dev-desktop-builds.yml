@@ -55,14 +55,12 @@ jobs:
           echo "${{ secrets.KEYSTORE }}" | base64 -d > /tmp/release.keystore
           ./Godot_v${GODOT_VERSION}-${GODOT_SUB}_linux.x86_64 --headless --export-release "Android" ./build/android/${EXPORT_NAME}_${MM_RELEASE}_android_release.apk
       - name: Upload Android debug artifact
-        if: ${{ github.event.inputs.artifacts == 'true' }}
         uses: actions/upload-artifact@v7
         with:
           name: android_debug_snapshot
           path: ./build/android/${{ env.EXPORT_NAME }}_${{ env.MM_RELEASE }}_android_debug.apk
           archive: false
       - name: Upload Android release apk
-        if: ${{ github.event.inputs.android_release == 'true' && github.event.inputs.artifacts == 'true' }}
         uses: actions/upload-artifact@v7
         with:
           name: android_release_snapshot

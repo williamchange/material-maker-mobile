@@ -1,60 +1,6 @@
-# Material Maker
+# material-maker-mobile
+unofficial material maker builds with touch support based on [PR #1565](https://github.com/RodZill4/material-maker/pull/1565)
 
-This is a tool based on [Godot Engine](https://godotengine.org/) that can
-be used to create textures procedurally and paint 3D models.
+Action Builds: ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/williamchange/material-maker-mobile/dev-desktop-builds.yml?branch=master&style=flat)
 
-Its user interface is based on Godot's GraphEdit node: textures and brushes are
-described as interconnected nodes.
-
-![Screenshot](material_maker/doc/images/screenshot.png)
-
-## Download
-
-- **[itch.io](https://rodzilla.itch.io/material-maker)**
-- **[Steam](https://store.steampowered.com/app/4110830/Material_Maker/)**
-
-On Windows, you can also install Material Maker using [Scoop](https://scoop.sh):
-
-```text
-scoop bucket add extras
-scoop install material-maker
-```
-... or [Chocolatey](https://chocolatey.org/) (default or portable install):
-```text
-choco install material-maker
-```
-```text
-choco install material-maker.portable
-```
-
-on macOS, you can also install Material Maker using [Homebrew](https://brew.sh/):
-
-```text
-brew install material-maker
-```
-
-Can't wait for next release? Automated builds from master branch are available (use at your own risk):
-
-[![Build Material Maker](https://github.com/RodZill4/material-maker/actions/workflows/dev-desktop-builds.yml/badge.svg?branch=master)](https://github.com/RodZill4/material-maker/actions/workflows/dev-desktop-builds.yml?query=branch%3Amaster)
-
-## Documentation
-
-- **[User manual](https://rodzill4.github.io/material-maker/doc/)**
-
-## Translations
-
-Translation files can be installed using the **Install** button in the **Preferences** dialog.
-
-- [Chinese translation](https://raw.githubusercontent.com/RodZill4/material-maker/f1be50b21a0f4991ac39e12a5362f5c5eb4c83a0/material_maker/locale/translations/zh.csv) (Created by **free_king**)
-
-## Community
-
-- **[Discord server](https://discord.gg/PF5V3mFwFM)**
-- **[Material Maker subreddit](https://www.reddit.com/r/MaterialMaker/)**
-
-## License
-
-Copyright (c) 2018-present Rodolphe Suescun and contributors
-
-Unless otherwise specified, files in this repository are licensed under the
-MIT license. See [LICENSE.md](LICENSE.md) for more information.
+Nightly Link:
