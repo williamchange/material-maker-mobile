@@ -53,57 +53,30 @@ func setup_signals() -> void:
 	parent.connection_drag_started.connect(hide_panel.unbind(3))
 	parent.draw.connect(draw_selection_area)
 
-func create_buttons() -> void:
-	buttons.close = create_button(parent.remove_selection)
-	buttons.minimize = create_button(parent.minimize_selection)
-	buttons.randomize = create_button()
-	buttons.generic = create_button()
-	buttons.custom = create_button()
+class ActionButton extends Button:
+	signal on_show_popup
 
-func update_button_icons() -> void:
-	buttons.close.icon = get_theme_icon("delete_2x", "MM_Icons")
-	buttons.minimize.icon = get_theme_icon("minimize", "MM_Icons")
-	buttons.randomize.icon = get_theme_icon("randomize", "MM_Icons")
-	buttons.generic.icon = get_theme_icon("generic_size", "MM_Icons")
-	buttons.custom.icon = get_theme_icon("draw_2x", "MM_Icons")
+	func _gui_input(event : InputEvent) -> void:
+		if event is InputEventMouseButton and event.pressed:
+			if event.button_index == MOUSE_BUTTON_RIGHT:
+				on_show_popup.emit()
 
-	buttons.randomize.add_theme_color_override("icon_normal_color", Color.WHITE)
+	func disconnect_actions() -> void:
+		for s in [ pressed, on_show_popup ]:
+			for connection in s.get_connections():
+				if s.is_connected(connection.callable):
+					s.disconnect(connection.callable)
 
-func create_button(pressed_callback : Callable = Callable()) -> ActionButton:
-	var button : ActionButton = ActionButton.new()
-	button.custom_minimum_size = BUTTON_SIZE
-	button.flat = true
-	button.expand_icon = true
-	if pressed_callback != Callable():
-		button.pressed.connect(pressed_callback)
-	container.add_child(button)
-	return button
+	func connect_actions(pressed_callback : Callable = Callable(),
+			popup_callback : Callable = Callable()) -> void:
+		disconnect_actions()
+		if visible:
+			if pressed_callback != Callable() and not pressed.is_connected(pressed_callback):
+				pressed.connect(pressed_callback)
+			if  popup_callback != Callable() and not on_show_popup.is_connected(popup_callback):
+				on_show_popup.connect(popup_callback)
 
-func init_stylebox() -> void:
-	if not sb_selection:
-		sb_selection = StyleBoxFlat.new()
-		sb_selection.set_border_width_all(2)
-		sb_selection.set_corner_radius_all(4)
-		sb_selection.corner_detail = 4
-
-func update_stylebox() -> void:
-	if not sb_selection:
-		init_stylebox()
-	var theme_path : String = mm_globals.main_window.theme.resource_path
-	if "classic" in theme_path:
-		sb_selection.bg_color = Color(0.204, 0.231, 0.31)
-		sb_selection.border_color = Color(0.325, 0.463, 0.682)
-	elif "dark" in theme_path:
-		sb_selection.bg_color = Color(0.14, 0.14, 0.14, 1.0)
-		sb_selection.border_color = Color(0.355, 0.355, 0.355, 1.0)
-	else:
-		sb_selection.bg_color = Color(0.521, 0.521, 0.521, 1.0)
-		sb_selection.border_color = Color(0.23, 0.23, 0.23, 1.0)
-
-func draw_selection_area() -> void:
-	if selection_area.size != Vector2.ZERO and sb_selection and visible:
-		var ci : RID = parent.get_canvas_item()
-		sb_selection.draw(ci, selection_area.grow(AREA_PAD))
+#region panel creation/update
 
 func create_panel() -> void:
 	if not is_node_ready():
@@ -173,6 +146,12 @@ func create_panel() -> void:
 	size = Vector2.ZERO
 	show_panel()
 
+func should_update_selection() -> void:
+	if is_updating:
+		return
+	is_updating = true
+	create_panel.call_deferred()
+
 func show_panel() -> void:
 	show()
 	move_to_front()
@@ -185,18 +164,14 @@ func hide_panel() -> void:
 	parent.queue_redraw()
 	is_updating = false
 
-func should_update_selection() -> void:
-	if is_updating:
-		return
-	is_updating = true
-	create_panel.call_deferred()
-
 func calc_node_rect(n : GraphElement) -> Rect2:
 	if n is MMGraphPortal:
 		var r : Rect2 = n.get_rect_with_link()
 		return Rect2(r.position * parent.zoom + n.position,
 				r.size * parent.zoom)
 	return Rect2(n.position, n.size * parent.zoom)
+
+#endregion
 
 #region generator conditionals
 
@@ -236,25 +211,62 @@ func should_custom_visible(g : MMGenBase) -> bool:
 
 #endregion
 
-class ActionButton extends Button:
-	signal on_show_popup
+#region area stylebox draw/update
 
-	func _gui_input(event : InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed:
-			if event.button_index == MOUSE_BUTTON_RIGHT:
-				on_show_popup.emit()
+func init_stylebox() -> void:
+	if not sb_selection:
+		sb_selection = StyleBoxFlat.new()
+		sb_selection.set_border_width_all(2)
+		sb_selection.set_corner_radius_all(4)
+		sb_selection.corner_detail = 4
 
-	func disconnect_actions() -> void:
-		for s in [ pressed, on_show_popup ]:
-			for connection in s.get_connections():
-				if s.is_connected(connection.callable):
-					s.disconnect(connection.callable)
+func update_stylebox() -> void:
+	if not sb_selection:
+		init_stylebox()
+	var theme_path : String = mm_globals.main_window.theme.resource_path
+	if "classic" in theme_path:
+		sb_selection.bg_color = Color(0.204, 0.231, 0.31)
+		sb_selection.border_color = Color(0.325, 0.463, 0.682)
+	elif "dark" in theme_path:
+		sb_selection.bg_color = Color(0.14, 0.14, 0.14, 1.0)
+		sb_selection.border_color = Color(0.355, 0.355, 0.355, 1.0)
+	else:
+		sb_selection.bg_color = Color(0.521, 0.521, 0.521, 1.0)
+		sb_selection.border_color = Color(0.23, 0.23, 0.23, 1.0)
 
-	func connect_actions(pressed_callback : Callable = Callable(),
-			popup_callback : Callable = Callable()) -> void:
-		disconnect_actions()
-		if visible:
-			if pressed_callback != Callable() and not pressed.is_connected(pressed_callback):
-				pressed.connect(pressed_callback)
-			if  popup_callback != Callable() and not on_show_popup.is_connected(popup_callback):
-				on_show_popup.connect(popup_callback)
+func draw_selection_area() -> void:
+	if selection_area.size != Vector2.ZERO and sb_selection and visible:
+		var ci : RID = parent.get_canvas_item()
+		sb_selection.draw(ci, selection_area.grow(AREA_PAD))
+
+#endregion
+
+#region button init/setup
+
+func create_buttons() -> void:
+	buttons.close = create_button(parent.remove_selection)
+	buttons.minimize = create_button(parent.minimize_selection)
+	buttons.randomize = create_button()
+	buttons.generic = create_button()
+	buttons.custom = create_button()
+
+func update_button_icons() -> void:
+	buttons.close.icon = get_theme_icon("delete_2x", "MM_Icons")
+	buttons.minimize.icon = get_theme_icon("minimize", "MM_Icons")
+	buttons.randomize.icon = get_theme_icon("randomize", "MM_Icons")
+	buttons.generic.icon = get_theme_icon("generic_size", "MM_Icons")
+	buttons.custom.icon = get_theme_icon("draw_2x", "MM_Icons")
+
+	buttons.randomize.add_theme_color_override("icon_normal_color", Color.WHITE)
+
+func create_button(pressed_callback : Callable = Callable()) -> ActionButton:
+	var button : ActionButton = ActionButton.new()
+	button.custom_minimum_size = BUTTON_SIZE
+	button.flat = true
+	button.expand_icon = true
+	if pressed_callback != Callable():
+		button.pressed.connect(pressed_callback)
+	container.add_child(button)
+	return button
+
+#endregion
