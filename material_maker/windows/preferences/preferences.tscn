@@ -632,6 +632,34 @@ text = "On"
 flat = false
 config_variable = "remember_anim_export"
 
+[node name="Touch" type="ScrollContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer" unique_id=881994305]
+visible = false
+layout_mode = 2
+theme_type_variation = &"MM_PreferenceTab"
+metadata/_tab_index = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch" unique_id=276816290]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TouchNodeActions" type="HBoxContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer" unique_id=1309858269]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer/TouchNodeActions" unique_id=895456211]
+layout_mode = 2
+text = "Node actions panel (requires restart)"
+
+[node name="NodeActions" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer/TouchNodeActions" unique_id=307131792 instance=ExtResource("1")]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+tooltip_text = "A touch-friendly panel that provides access to common actions(such as delete, minimize, randomize etc.) for selected node(s) in graph panel.
+
+This is enabled by default on Android."
+text = "On"
+flat = false
+config_variable = "touch_node_actions"
+
 [node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer" unique_id=245791047]
 layout_mode = 2
 theme_override_constants/margin_top = 4

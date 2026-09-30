@@ -69,6 +69,7 @@ const DEFAULT_CONFIG : Dictionary = {
 	ui_field_sensitivity = 1.0,
 	color_picker_floating = false,
 	keep_screen_on = true,
+	touch_node_actions = false,
 }
 
 
@@ -82,6 +83,8 @@ func _enter_tree():
 			if OS.get_name() == "Android":
 				if k in ["node_minimize_button", "node_close_button"]:
 					config.set_value("config", k, false)
+				elif k in ["touch_node_actions"]:
+					config.set_value("config", k, true)
 
 func _exit_tree():
 	config.save("user://mm_config.ini")
