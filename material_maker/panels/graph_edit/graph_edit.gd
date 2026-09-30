@@ -90,6 +90,7 @@ func _ready() -> void:
 	
 	if OS.get_name() == "Android":
 		node_actions_panel = NodeActionsPanel.new(self)
+		$GraphUI/ButtonReroll.hide()
 
 func _exit_tree():
 	remove_crash_recovery_file()
