@@ -261,19 +261,19 @@ func get_ui_scale() -> float:
 ## Creates a toast message.
 ## [param duration] set to 0 displays the message for a short period of time.
 func android_make_toast(message : String, duration : int = 1) -> void:
-	if MMTouch.android_runtime:
-		var activity : JavaObject = MMTouch.android_runtime.getActivity()
+	if mm_touch.android_runtime:
+		var activity : JavaObject = mm_touch.android_runtime.getActivity()
 		var toastCallable = func() -> void:
 			var ToastClass : JavaClass = JavaClassWrapper.wrap("android.widget.Toast")
 			ToastClass.makeText(activity, message, duration).show()
 
-		activity.runOnUiThread(MMTouch.android_runtime.createRunnableFromGodotCallable(toastCallable))
+		activity.runOnUiThread(mm_touch.android_runtime.createRunnableFromGodotCallable(toastCallable))
 	else:
 		printerr("Unable to access android runtime")
 
 ## Returns the current user's uid (i.e. the '0' in /storage/emulated/0).
 func android_get_user_uid() -> int:
-	if MMTouch.android_runtime:
+	if mm_touch.android_runtime:
 		var processClass : JavaClass = JavaClassWrapper.wrap("android.os.Process")
 		var userHandle : JavaClass = JavaClassWrapper.wrap("android.os.UserHandle")
 		return userHandle.getUserId(processClass.myUid())
@@ -282,8 +282,8 @@ func android_get_user_uid() -> int:
 	return -1
 
 func android_move_task_to_back() -> void:
-	if MMTouch.android_runtime:
-		MMTouch.android_runtime.getActivity().moveTaskToBack(true)
+	if mm_touch.android_runtime:
+		mm_touch.android_runtime.getActivity().moveTaskToBack(true)
 
 func android_open_url(url : String) -> void:
 	# can't open url directly via shell_open

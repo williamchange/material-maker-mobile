@@ -11,7 +11,7 @@ var touch_info : Dictionary[int, Vector2] = {}
 var _display_corner_radii : PackedInt32Array = PackedInt32Array([0, 0, 0, 0])
 var _dispalay_cutout_margins : PackedInt32Array = PackedInt32Array([0, 0, 0, 0])
 
-static var android_runtime : JNISingleton
+var android_runtime : JNISingleton
 
 # workaround for godot issue #123454 for Android 16
 var last_go_back_request : int = 0
