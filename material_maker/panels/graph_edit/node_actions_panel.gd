@@ -45,6 +45,10 @@ func _notification(what : int) -> void:
 		update_button_icons()
 		update_stylebox()
 
+func _input(event : InputEvent) -> void:
+	if event is InputEventPanGesture and event.delta.length():
+		hide_panel()
+
 func setup_signals() -> void:
 	parent.node_selected.connect(should_update_selection.unbind(1))
 	parent.scroll_offset_changed.connect(should_update_selection.unbind(1))
