@@ -43,9 +43,9 @@ jobs:
           mkdir -v -p ~/.local/share/godot/export_templates/${GODOT_VERSION}.${GODOT_SUB}
           mv ./templates/* ~/.local/share/godot/export_templates/${GODOT_VERSION}.${GODOT_SUB}
           mkdir -v -p ./build/android
-      - name: Export Android debug (apk)
-        run: |
-          ./Godot_v${GODOT_VERSION}-${GODOT_SUB}_linux.x86_64 --headless --export-debug "Android" ./build/android/${EXPORT_NAME}_${MM_RELEASE}_android_debug.apk
+      # - name: Export Android debug (apk)
+      #   run: |
+      #     ./Godot_v${GODOT_VERSION}-${GODOT_SUB}_linux.x86_64 --headless --export-debug "Android" ./build/android/${EXPORT_NAME}_${MM_RELEASE}_android_debug.apk
       - name: Export Android release (apk)
         env:
           GODOT_ANDROID_KEYSTORE_RELEASE_PATH: "/tmp/release.keystore"
@@ -54,11 +54,11 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE }}" | base64 -d > /tmp/release.keystore
           ./Godot_v${GODOT_VERSION}-${GODOT_SUB}_linux.x86_64 --headless --export-release "Android" ./build/android/${EXPORT_NAME}_${MM_RELEASE}_android_release.apk
-      - name: Upload Android debug artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: android_debug_snapshot
-          path: ./build/android/${{ env.EXPORT_NAME }}_${{ env.MM_RELEASE }}_android_debug.apk
+      # - name: Upload Android debug artifact
+      #   uses: actions/upload-artifact@v7
+      #   with:
+      #     name: android_debug_snapshot
+      #     path: ./build/android/${{ env.EXPORT_NAME }}_${{ env.MM_RELEASE }}_android_debug.apk
       - name: Upload Android release apk
         uses: actions/upload-artifact@v7
         with:
