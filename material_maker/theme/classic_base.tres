@@ -493,7 +493,7 @@ region = Rect2(112, 128, 16, 16)
 atlas = ExtResource("1_fw8f4")
 region = Rect2(32, 80, 16, 16)
 margin = Rect2(-2, -2, -4, -4)
-metadata/scale = 2.67
+metadata/scale = 2.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_pbgus"]
 atlas = ExtResource("1_fw8f4")
