@@ -26,6 +26,7 @@ func _init(graph : MMGraphEdit) -> void:
 	parent = graph
 	parent.add_child(self)
 	scale = Vector2(2.5, 2.5)
+	top_level = true
 
 func _ready() -> void:
 	hide()
@@ -47,8 +48,7 @@ func _notification(what : int) -> void:
 
 func _input(event : InputEvent) -> void:
 	if is_visible_in_tree() and event is InputEventPanGesture and event.delta.length():
-		if visible:
-			hide_panel()
+		hide_panel()
 
 func setup_signals() -> void:
 	parent.node_selected.connect(should_update_selection.unbind(1))
@@ -87,7 +87,7 @@ func create_panel() -> void:
 	if not is_node_ready():
 		return
 	while Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-		if Input.is_key_pressed(KEY_SHIFT):
+		if visible and Input.is_key_pressed(KEY_SHIFT):
 			hide()
 		await get_tree().process_frame
 	await get_tree().process_frame
@@ -97,8 +97,8 @@ func create_panel() -> void:
 		hide_panel()
 		return
 
-	for b : ActionButton in container.get_children():
-		b.show()
+	for button : ActionButton in container.get_children():
+		button.show()
 
 	var nodes_rect : Rect2 = Rect2(0, 0, -1, -1)
 	for n in selected_nodes:
@@ -148,6 +148,12 @@ func create_panel() -> void:
 		buttons.custom.visible = false
 
 		buttons.randomize.connect_actions(randomize_selected_nodes)
+
+	# keep top-level behavior only within graph
+	position += parent.global_position
+	top_level = parent.get_global_rect().encloses(get_rect())
+	if not top_level:
+		position -= parent.global_position
 
 	size = Vector2.ZERO
 	show_panel()
