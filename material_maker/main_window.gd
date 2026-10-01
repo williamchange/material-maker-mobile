@@ -122,7 +122,7 @@ const MENU : Array[Dictionary] = [
 	#{ menu="Tools/Generate screenshots for the library nodes", command="generate_screenshots", mode="material" },
 
 	{ menu="Help/User manual", command="show_doc", shortcut="F1" },
-	{ menu="Help/Example projects", command="show_example_projects", not_in_ports=["Android"]},
+	{ menu="Help/Example projects", command="show_example_projects"},
 	{ menu="Help/Show selected library item documentation", command="show_library_item_doc", shortcut="Control+F1" },
 	{ menu="Help/Report a bug", command="bug_report" },
 	{ menu="Help/" },
@@ -1294,13 +1294,17 @@ func about() -> void:
 	add_dialog(about_box, OS.get_name() == "Android")
 
 func show_example_projects() -> void:
-	var base_dir : String = MMPaths.get_resource_dir().replace("\\", "/")
-	var release_examples_path : String = base_dir.path_join("examples")
-	var devel_examples_path : String = ProjectSettings.globalize_path("res://material_maker/examples")
-	for p in [ release_examples_path, devel_examples_path ]:
-		if DirAccess.dir_exists_absolute(p):
-			OS.shell_open(p)
-			return
+	if OS.get_name() == "Android":
+		android_copy_examples()
+		android_load_example_project()
+	else:
+		var base_dir : String = MMPaths.get_resource_dir().replace("\\", "/")
+		var release_examples_path : String = base_dir.path_join("examples")
+		var devel_examples_path : String = ProjectSettings.globalize_path("res://material_maker/examples")
+		for p in [ release_examples_path, devel_examples_path ]:
+			if DirAccess.dir_exists_absolute(p):
+				OS.shell_open(p)
+				return
 
 # Preview
 
@@ -1645,5 +1649,33 @@ func android_set_theme_prop(t : Theme) -> void:
 
 	t.set_stylebox("pressed", "Button", t.get_stylebox("hover_pressed", "Button"))
 	t.set_stylebox("hover", "Button", t.get_stylebox("normal", "Button"))
+
+func android_copy_examples() -> void:
+	# copy example projects from exported examples
+	var base : String = "res://material_maker/examples/"
+	var examples : String = "user://examples/"
+	DirAccess.make_dir_absolute("user://examples/")
+	var dir : DirAccess = DirAccess.open(base)
+	dir.list_dir_begin()
+	var arr : PackedStringArray
+	while true:
+		var f : String = dir.get_next()
+		arr.push_back(f)
+		if f.is_empty():
+			break
+		if f.get_extension() == "ptex" and not FileAccess.file_exists(examples.path_join(f)):
+			dir.copy(base.path_join(f), examples.path_join(f))
+	dir.list_dir_end()
+
+func android_load_example_project() -> void:
+	const fd : String ="res://material_maker/windows/file_dialog/file_dialog.tscn"
+	var dialog : FileDialog = preload(fd).instantiate()
+	dialog.access = FileDialog.ACCESS_USERDATA
+	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES
+	dialog.current_dir = "examples"
+	dialog.add_filter("*.ptex;Procedural Textures File")
+	var files = await dialog.select_files()
+	if files.size() > 0:
+		do_load_project(files[0])
 
 #endregion

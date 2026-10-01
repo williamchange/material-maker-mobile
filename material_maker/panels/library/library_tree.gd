@@ -51,7 +51,8 @@ func _get_drag_data(_position) -> Variant:
 func _on_gui_input(event : InputEvent) -> void:
 	if not force_drag_started:
 		if event is InputEventScreenDrag and event.index == 0:
-			var icon_rect : Rect2 = get_item_area_rect(get_selected(), 1).grow(6.0)
+			var icon_rect : Rect2 = get_item_area_rect(get_selected(), 1)
+			icon_rect = icon_rect.grow_individual(6, 0, 6, 0)
 			if icon_rect.has_point(get_local_mouse_position()):
 				## 1-finger item drag from library
 				_force_drag()
