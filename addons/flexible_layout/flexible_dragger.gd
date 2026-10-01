@@ -34,6 +34,7 @@ func set_split(s, i : int, v : bool):
 
 	if OS.get_name() == "Android":
 		touch_dragger.setup()
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 var drag_limits : Vector2i
 var drag_position : int
