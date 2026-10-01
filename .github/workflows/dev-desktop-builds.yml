@@ -3,8 +3,8 @@ name: "Build Material Maker"
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
+    paths-ignore:
+      - "README.md"
 
 env:
   GODOT_VERSION: 4.7.2
