@@ -8,6 +8,26 @@ var main_window : MainWindow
 @warning_ignore("unused_signal")
 signal preferences_updated
 
+
+const INVALID : int = -1
+const DEFAULT_DARK : int = 0
+const DEFAULT_LIGHT : int = 1
+const CLASSIC : int = 2
+
+## Returns current theme based on Main Window's theme resource path.
+var current_theme : int:
+	get:
+		var t : String = main_window.theme.resource_path.get_file()
+		match t.trim_suffix(".tres").to_lower():
+			"default dark":
+				return DEFAULT_DARK
+			"default light":
+				return DEFAULT_LIGHT
+			"classic":
+				return CLASSIC
+			_:
+				return INVALID
+
 var config : ConfigFile = ConfigFile.new()
 const DEFAULT_CONFIG : Dictionary = {
 	locale = "",
@@ -72,21 +92,25 @@ const DEFAULT_CONFIG : Dictionary = {
 	touch_node_actions = false,
 }
 
+const ANDROID_CONFIG : Dictionary[String, Variant] = {
+	node_minimize_button = false,
+	node_close_button = false,
+	touch_node_actions = true,
+	ui_3d_preview_resolution = 1.0,
+	ui_3d_preview_tesselation_detail = 128,
+}
 
-func _enter_tree():
+func _enter_tree() -> void:
 	config.load("user://mm_config.ini")
 	for k : String in DEFAULT_CONFIG.keys():
 		if not config.has_section_key("config", k):
 			config.set_value("config", k, DEFAULT_CONFIG[k])
 
 			# android-specific defaults
-			if OS.get_name() == "Android":
-				if k in ["node_minimize_button", "node_close_button"]:
-					config.set_value("config", k, false)
-				elif k in ["touch_node_actions"]:
-					config.set_value("config", k, true)
+			if OS.get_name() == "Android" and k in ANDROID_CONFIG:
+				config.set_value("config", k, ANDROID_CONFIG[k])
 
-func _exit_tree():
+func _exit_tree() -> void:
 	config.save("user://mm_config.ini")
 
 # Config

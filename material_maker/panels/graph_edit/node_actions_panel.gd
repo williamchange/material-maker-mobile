@@ -120,15 +120,16 @@ func create_panel() -> void:
 		var gen : MMGenBase = node.generator
 
 		if node.get_script() in [ MMGraphPortal, MMGraphReroute,
-				MMGraphCommentLine, MMGraphDebug ]:
+				MMGraphCommentLine, MMGraphComment, MMGraphDebug ]:
 			buttons.minimize.hide()
 			buttons.randomize.hide()
 			buttons.generic.hide()
 			buttons.custom.hide()
 
-			position = node.position
-			position.x += node.size.x * 0.5 * parent.zoom - size.x - 6
-			position.y += (node.size.y + H_PAD) * parent.zoom
+			if node is not MMGraphComment:
+				position = node.position
+				position.x += node.size.x * 0.5 * parent.zoom - size.x - 6
+				position.y += (node.size.y + H_PAD) * parent.zoom
 		else:
 			buttons.close.visible = should_close_visible(gen)
 			buttons.randomize.visible = should_random_visible(gen)
@@ -235,16 +236,17 @@ func init_stylebox() -> void:
 func update_stylebox() -> void:
 	if not sb_selection:
 		init_stylebox()
-	var theme_path : String = mm_globals.main_window.theme.resource_path
-	if "classic" in theme_path:
-		sb_selection.bg_color = Color(0.204, 0.231, 0.31)
-		sb_selection.border_color = Color(0.325, 0.463, 0.682)
-	elif "dark" in theme_path:
-		sb_selection.bg_color = Color(0.14, 0.14, 0.14, 1.0)
-		sb_selection.border_color = Color(0.355, 0.355, 0.355, 1.0)
-	else:
-		sb_selection.bg_color = Color(0.521, 0.521, 0.521, 1.0)
-		sb_selection.border_color = Color(0.23, 0.23, 0.23, 1.0)
+
+	match mm_globals.current_theme:
+		mm_globals.CLASSIC:
+			sb_selection.bg_color = Color(0.204, 0.231, 0.31)
+			sb_selection.border_color = Color(0.325, 0.463, 0.682)
+		mm_globals.DEFAULT_DARK:
+			sb_selection.bg_color = Color(0.14, 0.14, 0.14, 1.0)
+			sb_selection.border_color = Color(0.355, 0.355, 0.355, 1.0)
+		mm_globals.DEFAULT_LIGHT:
+			sb_selection.bg_color = Color(0.521, 0.521, 0.521, 1.0)
+			sb_selection.border_color = Color(0.23, 0.23, 0.23, 1.0)
 
 func draw_selection_area() -> void:
 	if selection_area.size != Vector2.ZERO and sb_selection and visible:
