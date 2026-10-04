@@ -180,9 +180,21 @@ func should_node_panel_center(node : GraphElement) -> bool:
 			MMGraphCommentLine ]
 
 func set_top_level() -> void:
-	# keep top level and have panel visible only within graph
+	# have panel visible only within graph bounds
 	var prev : Vector2 = global_position
-	top_level = parent.get_global_rect().encloses(get_global_rect())
+	var graph_rect : Rect2 = parent.get_global_rect()
+	var panel_rect : Rect2 = get_global_rect()
+
+	# account for graph scrollbars width/height
+	var wh : int = -get_theme_stylebox("scroll").border_width_left * 2.0 - 6.0
+	graph_rect = graph_rect.grow_individual(0.0, 0.0, wh, wh)
+
+	# avoid covering subgraph menu and graph menubar
+	var graph_menu : ScrollContainer = mm_globals.main_window.projects_panel.get_node("MenuBar")
+	var intersect_subgraph_ui : bool = parent.subgraph_ui.get_global_rect().intersects(panel_rect)
+	var intersect_graph_menu : bool = graph_menu.get_global_rect().intersects(panel_rect)
+
+	top_level = graph_rect.encloses(get_global_rect()) and not (intersect_subgraph_ui or intersect_graph_menu)
 	global_position = prev
 
 var _gradient_edits : Array[Node]
