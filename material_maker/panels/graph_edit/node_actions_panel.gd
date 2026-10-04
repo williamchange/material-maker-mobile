@@ -189,17 +189,21 @@ func avoid_intersecting_popups() -> void:
 	# avoid intersecting with GradientEdit's popup
 	if not selected_nodes.size() == 1 or not selected_nodes[0]:
 		return
-	const margin : float = 8.0
 	var node : MMGraphNodeMinimal = selected_nodes[0]
-	if "gradient" in node.controls and is_instance_valid(node.controls.gradient.popup):
-		var popup : GradientPopup = node.controls.gradient.popup
-		if not popup:
-			return
-		var panel_r : Rect2 = get_global_rect()
-		var popup_r : Rect2 = popup.get_global_rect()
-		if get_global_rect().intersects(popup_r):
-			var overlap : Rect2 = panel_r.intersection(popup_r)
-			global_position.y += -overlap.size.y - margin
+	var popup : GradientPopup
+
+	for c in node.controls:
+		if (node.controls[c] is GradientEdit
+				and node.controls[c] and is_instance_valid(node.controls[c].popup)):
+			popup = node.controls[c].popup
+			break
+	if not popup:
+		return
+
+	var panel_r : Rect2 = get_global_rect()
+	var popup_r : Rect2 = popup.get_global_rect()
+	if panel_r.intersects(popup_r):
+		global_position.y = popup_r.position.y - panel_r.size.y
 
 func should_panel_update() -> void:
 	if is_updating:
