@@ -5,6 +5,11 @@ extends PanelContainer
 
 static var sb_selection : StyleBoxFlat
 
+const BUTTON_SIZE : Vector2 = Vector2(16, 16)
+const H_PAD : int = 16
+const AREA_PAD : int = 24
+const PADDING : Vector2 = Vector2(AREA_PAD + H_PAD, -AREA_PAD)
+
 var parent : MMGraphEdit
 var selection_area : Rect2
 
@@ -12,11 +17,6 @@ var is_updating : bool = false
 var is_theme_updating : bool = false
 
 var selected_nodes : Array
-
-const BUTTON_SIZE : Vector2 = Vector2(16, 16)
-const H_PAD : int = 16
-const AREA_PAD : int = 24
-const PADDING : Vector2 = Vector2(AREA_PAD + H_PAD, -AREA_PAD)
 
 var container : VBoxContainer
 var buttons : Dictionary[String, ActionButton]
@@ -34,6 +34,7 @@ func _ready() -> void:
 	setup_signals()
 
 	container = VBoxContainer.new()
+	container.minimum_size_changed.connect(set.bind("size", Vector2.ZERO))
 	add_child(container)
 	create_buttons()
 
@@ -50,9 +51,14 @@ func _input(event : InputEvent) -> void:
 	if is_visible_in_tree() and event is InputEventPanGesture and event.delta.length():
 		hide_panel()
 
+func viewport_focus_changed(c : Control) -> void:
+	if visible and c.owner and c.owner.get_script() in [GradientPopup, GradientEdit]:
+		hide_panel()
+
 func setup_signals() -> void:
-	parent.node_selected.connect(should_update_selection.unbind(1))
-	parent.scroll_offset_changed.connect(should_update_selection.unbind(1))
+	get_viewport().gui_focus_changed.connect(viewport_focus_changed)
+	parent.node_selected.connect(should_panel_update.unbind(1))
+	parent.scroll_offset_changed.connect(should_panel_update.unbind(1))
 	parent.node_deselected.connect(hide_panel.unbind(1))
 	parent.begin_node_move.connect(hide_panel)
 	parent.connection_drag_started.connect(hide_panel.unbind(3))
@@ -84,19 +90,21 @@ class ActionButton extends Button:
 
 #region panel creation/update
 
-func create_panel() -> void:
-	if not is_node_ready():
-		return
+func input_released() -> void:
 	while Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		if visible and Input.is_key_pressed(KEY_SHIFT):
 			hide()
 		await get_tree().process_frame
 	await get_tree().process_frame
 
+func create_panel() -> void:
+	if not is_node_ready():
+		return
+	await input_released()
+
 	selected_nodes = parent.get_selected_nodes()
 	if selected_nodes.is_empty():
-		hide_panel()
-		return
+		return hide_panel()
 
 	for button : ActionButton in container.get_children():
 		button.show()
@@ -108,8 +116,8 @@ func create_panel() -> void:
 		else:
 			nodes_rect = nodes_rect.merge(calc_node_rect(n))
 
-		if not n.tree_exiting.is_connected(should_update_selection):
-			n.tree_exiting.connect(should_update_selection)
+		if not n.tree_exiting.is_connected(should_panel_update):
+			n.tree_exiting.connect(should_panel_update)
 
 	position = nodes_rect.get_support(Vector2(1, -1))
 
@@ -120,9 +128,7 @@ func create_panel() -> void:
 		var node : GraphElement = selected_nodes[0]
 		var gen : MMGenBase = node.generator
 
-		if node.get_script() in [ MMGraphPortal, MMGraphReroute,
-				MMGraphCommentLine, MMGraphSwitch, MMGraphComment,
-				MMGraphDebug, MMGraphNodeRemote ]:
+		if is_node_simple(node):
 			buttons.minimize.hide()
 			buttons.randomize.hide()
 			buttons.generic.hide()
@@ -132,11 +138,10 @@ func create_panel() -> void:
 				buttons.custom.show()
 				buttons.custom.connect_actions(node_switch_edit.bind(node))
 
-			if node.get_script() not in [
-					MMGraphNodeRemote, MMGraphSwitch, MMGraphComment]:
-				position = node.position
-				position.x += node.size.x * 0.5 * parent.zoom - size.x - 6
-				position.y += (node.size.y + H_PAD) * parent.zoom
+		if is_node_center_panel(node):
+			position = node.position
+			position.x += node.size.x * 0.5 * parent.zoom - size.x - 6
+			position.y += (node.size.y + H_PAD) * parent.zoom
 		else:
 			buttons.close.visible = should_close_visible(gen)
 			buttons.randomize.visible = should_random_visible(gen)
@@ -146,6 +151,7 @@ func create_panel() -> void:
 			buttons.randomize.connect_actions(node.on_randomness_pressed, node.randomness_button_create_popup)
 			buttons.generic.connect_actions(node.on_generic_pressed, node.generic_button_create_popup)
 			buttons.custom.connect_actions(node.edit_generator, node.custom_button_create_popup)
+
 	elif selected_nodes.size() > 1:
 		selection_area = nodes_rect
 		position += PADDING
@@ -157,16 +163,45 @@ func create_panel() -> void:
 
 		buttons.randomize.connect_actions(randomize_selected_nodes)
 
+	size = Vector2.ZERO
+
+	set_top_level()
+	avoid_intersecting_popups()
+	show_panel()
+
+func is_node_simple(node : GraphElement) -> bool:
+	return node.get_script() in [ MMGraphPortal, MMGraphReroute,
+			MMGraphCommentLine, MMGraphSwitch, MMGraphComment,
+			MMGraphDebug, MMGraphNodeRemote ]
+
+func is_node_center_panel(node : GraphElement) -> bool:
+	return node.get_script() in [ MMGraphPortal, MMGraphReroute,
+			MMGraphCommentLine ]
+
+func set_top_level() -> void:
 	# keep top-level behavior only within graph
 	position += parent.global_position
 	top_level = parent.get_global_rect().encloses(get_rect())
 	if not top_level:
 		position -= parent.global_position
 
-	size = Vector2.ZERO
-	show_panel()
+func avoid_intersecting_popups() -> void:
+	# avoid intersecting with GradientEdit's popup
+	if not selected_nodes.size() == 1 or not selected_nodes[0]:
+		return
+	const margin : float = 8.0
+	var node : MMGraphNodeMinimal = selected_nodes[0]
+	if "gradient" in node.controls and is_instance_valid(node.controls.gradient.popup):
+		var popup : GradientPopup = node.controls.gradient.popup
+		if not popup:
+			return
+		var panel_r : Rect2 = get_global_rect()
+		var popup_r : Rect2 = popup.get_global_rect()
+		if get_global_rect().intersects(popup_r):
+			var overlap : Rect2 = panel_r.intersection(popup_r)
+			global_position.y += -overlap.size.y - margin
 
-func should_update_selection() -> void:
+func should_panel_update() -> void:
 	if is_updating:
 		return
 	is_updating = true

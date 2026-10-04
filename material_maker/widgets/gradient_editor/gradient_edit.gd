@@ -280,12 +280,6 @@ func _on_popup_button_toggled(toggled_on: bool) -> void:
 
 		update_popup_position()
 		set_notify_transform(true)
-
-		if mm_globals.get_config("touch_node_actions"):
-			var parent_node : Control = get_parent().get_parent()
-			if parent_node is GraphElement:
-				parent_node.selected = false
-
 	else:
 		if is_instance_valid(popup):
 			popup.close()
