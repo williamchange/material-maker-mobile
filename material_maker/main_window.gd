@@ -134,8 +134,11 @@ enum WinTabletDriver { WININK, WINTAB, DISABLED }
 func _enter_tree() -> void:
 	mm_globals.main_window = self
 	if OS.get_name() == "Android":
-		android_setup_status_bar()
 		ready.connect(android_setup_margins)
+		mm_globals.preferences_updated.connect(android_setup_margins)
+
+	if mm_globals.get_config("touch_optimization"):
+		android_setup_status_bar()
 
 func _ready() -> void:
 	get_window().borderless = false
@@ -1612,41 +1615,63 @@ func _draw_debug():
 
 func android_setup_margins() -> void:
 	# offset by MM_MainBackground stylebox content margins
-	$MainContainer.add_theme_constant_override("margin_left",
-			maxi(mm_touch.cutout_margins(SIDE_LEFT) - 10, 0))
-	$MainContainer.add_theme_constant_override("margin_right",
-			maxi(mm_touch.cutout_margins(SIDE_RIGHT) - 10, 0))
+	if not mm_globals.get_config("touch_full_screen"):
+		$MainContainer.add_theme_constant_override("margin_left",
+				maxi(mm_touch.cutout_margins(SIDE_LEFT) - 10, 0))
+		$MainContainer.add_theme_constant_override("margin_right",
+				maxi(mm_touch.cutout_margins(SIDE_RIGHT) - 10, 0))
+	else:
+		$MainContainer.remove_theme_constant_override("margin_right")
+		$MainContainer.remove_theme_constant_override("margin_left")
 
 func android_setup_status_bar() -> void:
 	# move status bar items to menu bar
 	var status_bar_hbox : HBoxContainer =  $MainContainer/VBoxContainer/StatusBar/HBox
 	var menu_bar_hbox : HBoxContainer = $MainContainer/VBoxContainer/TopBar/Menu
+
 	status_bar_hbox.owner = null
 	status_bar_hbox.reparent(menu_bar_hbox.get_parent())
 	status_bar_hbox.owner = self
 
-	var spacer : Control = Control.new()
-	spacer.name = "StatusBarSpacer"
-	status_bar_hbox.add_child(spacer)
+	var status_spacer : Control = Control.new()
+	status_spacer.name = "StatusBarSpacer"
+	status_bar_hbox.add_child(status_spacer)
+	mm_globals.preferences_updated.connect(android_update_status_margins.bind(status_spacer))
+	android_update_status_margins(status_spacer)
+
+	var menu_spacer : Control = Control.new()
+	menu_spacer.name = "MenuBarSpacer"
+	menu_bar_hbox.add_child(menu_spacer)
+	menu_bar_hbox.move_child(menu_spacer, 0)
+	mm_globals.preferences_updated.connect(android_update_menu_margins.bind(menu_spacer))
+	android_update_menu_margins(menu_spacer)
 
 	await status_bar_hbox.ready
 	status_bar_hbox.get_node("Tip").hide()
 	$MainContainer/VBoxContainer/StatusBar.hide()
-	android_update_status_bar_margins(spacer)
-	mm_globals.preferences_updated.connect(
-			android_update_status_bar_margins.bind(spacer))
 
-func android_update_status_bar_margins(spacer : Control) -> void:
-	# avoid cutout and corner
-	var r_margin : int = mm_touch.calc_margins(Side.SIDE_RIGHT)
-	spacer.custom_minimum_size.x = r_margin
+func android_update_menu_margins(spacer : Control) -> void:
+	android_set_menu_stautus_bar_margins(spacer, SIDE_LEFT, CORNER_TOP_RIGHT)
+	
+func android_update_status_margins(spacer : Control) -> void:
+	android_set_menu_stautus_bar_margins(spacer, SIDE_RIGHT, CORNER_BOTTOM_RIGHT)
 
-	# avoid screen edges
-	var r : float = mm_touch.corner_radius(Corner.CORNER_BOTTOM_RIGHT)
+func android_set_menu_stautus_bar_margins(spacer : Control,
+		side : Side, corner : Corner) -> void:
+
+	var corner_reach : float = 0.0
+
+	# avoid screen corners
+	var r : float = mm_touch.corner_radius(corner)
 	if r > 0.0:
 		var h : float = 36.0 # window title_height theme constant
-		var reach : float = sqrt(maxf((r) ** 2.0 - (r-h) ** 2.0, 0.0))
-		spacer.custom_minimum_size.x = reach / mm_globals.get_ui_scale()
+		corner_reach = sqrt(maxf((r) ** 2.0 - (r-h) ** 2.0, 0.0))
+		corner_reach /= mm_globals.get_ui_scale()
+
+	if mm_globals.get_config("touch_full_screen"):
+		spacer.custom_minimum_size.x = corner_reach
+	else:
+		spacer.custom_minimum_size.x = maxf(corner_reach - mm_touch.cutout_margins(side), 0.0)
 
 func android_set_theme_overrides(t : Theme) -> void:
 	const vh_scroll_width : int = 10
@@ -1658,11 +1683,10 @@ func android_set_theme_overrides(t : Theme) -> void:
 	sh.set_border_width(SIDE_TOP, vh_scroll_width)
 	sh.set_border_width(SIDE_BOTTOM, vh_scroll_width)
 
-	t.set_constant("v_separation", "PopupMenu", 6)
-	t.set_constant("v_separation", "Tree", 6)
-	t.set_constant("v_separation", "ItemList", 6)
-	t.set_constant("v_separation", "MM_AddNodePanelList", 10)
-	t.set_constant("resize_margin", "Window", 24)
+	t.set_constant("v_separation", "PopupMenu", 16)
+	t.set_constant("v_separation", "ItemList", 16)
+	t.set_constant("v_separation", "MM_AddNodePanelList", 16)
+	t.set_constant("resize_margin", "Window", 32)
 
 	t.set_stylebox("pressed", "Button", t.get_stylebox("hover_pressed", "Button"))
 	t.set_stylebox("hover", "Button", t.get_stylebox("normal", "Button"))
@@ -1699,9 +1723,10 @@ func android_process_doc_path(doc_dir : String, doc_name : String) -> String:
 	const mappings : Dictionary[String, String] = {
 		"miscellaneous_aperture_in": "aperture_nodes",
 		"miscellaneous_aperture_out": "aperture_nodes",
+		"miscellaneous_aperture": "aperture_nodes",
 		"miscellaneous_reroute": "reroute_nodes",
 		"miscellaneous": "miscellaneous_nodes",
-		"wofkflow": "nodes_workflow",
+		"workflow": "nodes_workflow",
 		"transform": "nodes_transform",
 		"filter": "nodes_filter",
 		"noise": "nodes_noise",

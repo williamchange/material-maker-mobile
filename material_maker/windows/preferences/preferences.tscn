@@ -680,6 +680,23 @@ text = "On"
 flat = false
 config_variable = "touch_optimization"
 
+[node name="TouchFullScreen" type="HBoxContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer" unique_id=860528142]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer/TouchFullScreen" unique_id=93076913]
+layout_mode = 2
+text = "Enable full screen"
+
+[node name="FullScreen" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer/TouchFullScreen" unique_id=1590147791 instance=ExtResource("1")]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+tooltip_text = "When enabled, this extends the window towards screen edges."
+text = "On"
+flat = false
+config_variable = "touch_full_screen"
+
 [node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer" unique_id=245791047]
 layout_mode = 2
 theme_override_constants/margin_top = 4

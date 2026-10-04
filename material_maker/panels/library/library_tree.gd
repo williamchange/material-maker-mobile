@@ -10,6 +10,8 @@ func _on_ready() -> void:
 	for node in get_children(true):
 		if node is VScrollBar:
 			tree_scrollbar = node
+	if mm_globals.get_config("touch_optimization"):
+		%Tree.add_theme_constant_override("v_separation", 4)
 
 func get_last_item(parent : TreeItem):
 	while true:
@@ -86,7 +88,7 @@ func _get_data_preview() -> Dictionary:
 			preview = Label.new()
 			preview.text = data.tree_item
 
-		if OS.get_name() == "Android":
+		if mm_globals.get_config("touch_optimization"):
 			var offset : Vector2 = Vector2.ZERO
 			preview.scale = Vector2(1.5, 1.5)
 			offset = preview_texture.get_size() if preview_texture else preview.size
