@@ -647,18 +647,38 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer/TouchNodeActions" unique_id=895456211]
 layout_mode = 2
-text = "Node actions panel (requires restart)"
+text = "Enable node actions panel (requires restart)"
 
 [node name="NodeActions" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer/TouchNodeActions" unique_id=307131792 instance=ExtResource("1")]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 10
-tooltip_text = "A touch-friendly panel that provides access to common actions(such as delete, minimize, randomize etc.) for selected node(s) in graph panel.
+tooltip_text = "A touch-friendly panel that provides access to common actions
+(such as delete, minimize, randomize etc.) for selected node(s) in graph panel.
 
 This is enabled by default on Android."
 text = "On"
 flat = false
 config_variable = "touch_node_actions"
+
+[node name="TouchOptimizations" type="HBoxContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer" unique_id=315705879]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer/TouchOptimizations" unique_id=1640622729]
+layout_mode = 2
+text = "Enable touch optimizations (requires restart)"
+
+[node name="TouchOptimize" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/Touch/VBoxContainer/TouchOptimizations" unique_id=1259798418 instance=ExtResource("1")]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+tooltip_text = "When enabled, this increases the touch area of scrollbars, makes vertical seperation between popup menu items
+larger, enables a touch dragger for panel splits etc. to increase usability on smaller screens.
+
+This is enabled by default on Android."
+text = "On"
+flat = false
+config_variable = "touch_optimization"
 
 [node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer" unique_id=245791047]
 layout_mode = 2
