@@ -138,7 +138,7 @@ func create_panel() -> void:
 				buttons.custom.show()
 				buttons.custom.connect_actions(node_switch_edit.bind(node))
 
-			if is_node_center_panel(node):
+			if should_node_panel_center(node):
 				var local_p : Vector2 = node.position
 				local_p.x += node.size.x * 0.5 * parent.zoom - size.x - 6
 				local_p.y += (node.size.y + H_PAD) * parent.zoom
@@ -177,7 +177,7 @@ func is_node_simple(node : GraphElement) -> bool:
 			MMGraphCommentLine, MMGraphSwitch, MMGraphComment,
 			MMGraphDebug, MMGraphNodeRemote ]
 
-func is_node_center_panel(node : GraphElement) -> bool:
+func should_node_panel_center(node : GraphElement) -> bool:
 	return node.get_script() in [ MMGraphPortal, MMGraphReroute,
 			MMGraphCommentLine ]
 
