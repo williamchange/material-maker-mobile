@@ -13,7 +13,7 @@ func _init():
 	set_meta("flexlayout", true)
 
 func _ready() -> void:
-	if OS.get_name() == "Android":
+	if mm_globals.get_config("touch_optimization"):
 		touch_dragger = TouchDragger.new()
 		touch_dragger.name = "TouchDragger"
 		add_child(touch_dragger)
@@ -32,7 +32,7 @@ func set_split(s, i : int, v : bool):
 		mouse_default_cursor_shape = Control.CURSOR_HSPLIT
 		$TextureRect.texture = get_theme_icon("grabber", "HSplitContainer")
 
-	if OS.get_name() == "Android":
+	if mm_globals.get_config("touch_optimization"):
 		touch_dragger.setup()
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 

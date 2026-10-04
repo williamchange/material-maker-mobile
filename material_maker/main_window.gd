@@ -649,7 +649,7 @@ func change_theme(theme_name) -> void:
 	await get_tree().process_frame
 	theme = _theme
 
-	if OS.get_name() == "Android":
+	if mm_globals.get_config("touch_optimization"):
 		android_set_theme_overrides(theme)
 
 	if "classic" in theme_name:
@@ -1633,7 +1633,8 @@ func android_setup_status_bar() -> void:
 	status_bar_hbox.get_node("Tip").hide()
 	$MainContainer/VBoxContainer/StatusBar.hide()
 	android_update_status_bar_margins(spacer)
-	mm_globals.preferences_updated.connect(android_update_status_bar_margins.bind(spacer))
+	mm_globals.preferences_updated.connect(
+			android_update_status_bar_margins.bind(spacer))
 
 func android_update_status_bar_margins(spacer : Control) -> void:
 	# avoid cutout and corner
@@ -1648,7 +1649,6 @@ func android_update_status_bar_margins(spacer : Control) -> void:
 		spacer.custom_minimum_size.x = reach / mm_globals.get_ui_scale()
 
 func android_set_theme_overrides(t : Theme) -> void:
-	# Android-specific theme customizations
 	const vh_scroll_width : int = 10
 	var sv : StyleBoxFlat = t.get_stylebox("scroll", "VScrollBar")
 	sv.set_border_width(SIDE_LEFT, vh_scroll_width)

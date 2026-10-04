@@ -194,7 +194,7 @@ func set_top_level() -> void:
 	var intersect_subgraph_ui : bool = parent.subgraph_ui.get_global_rect().intersects(panel_rect)
 	var intersect_graph_menu : bool = graph_menu.get_global_rect().intersects(panel_rect)
 
-	top_level = graph_rect.encloses(get_global_rect()) and not (intersect_subgraph_ui or intersect_graph_menu)
+	top_level = graph_rect.encloses(panel_rect) and not (intersect_subgraph_ui or intersect_graph_menu)
 	global_position = prev
 
 var _gradient_edits : Array[Node]
@@ -309,14 +309,14 @@ func update_stylebox() -> void:
 
 	match mm_globals.current_theme():
 		mm_globals.CLASSIC:
-			sb_selection.bg_color = Color(0.204, 0.231, 0.31)
-			sb_selection.border_color = Color(0.325, 0.463, 0.682)
+			sb_selection.bg_color = Color(0.22, 0.255, 0.36, 1.0)
+			sb_selection.border_color = Color(0.377, 0.482, 0.65, 1.0)
 		mm_globals.DEFAULT_DARK:
 			sb_selection.bg_color = Color(0.14, 0.14, 0.14, 1.0)
 			sb_selection.border_color = Color(0.355, 0.355, 0.355, 1.0)
 		mm_globals.DEFAULT_LIGHT:
-			sb_selection.bg_color = Color(0.521, 0.521, 0.521, 1.0)
-			sb_selection.border_color = Color(0.23, 0.23, 0.23, 1.0)
+			sb_selection.bg_color = Color(0.62, 0.62, 0.62, 1.0)
+			sb_selection.border_color = Color(0.33, 0.33, 0.33, 1.0)
 
 func draw_selection_area() -> void:
 	if selection_area.size != Vector2.ZERO and sb_selection and visible:

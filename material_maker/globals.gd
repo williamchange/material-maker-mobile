@@ -76,12 +76,14 @@ const DEFAULT_CONFIG : Dictionary = {
 	color_picker_floating = false,
 	keep_screen_on = true,
 	touch_node_actions = false,
+	touch_optimization = false,
 }
 
 const ANDROID_CONFIG : Dictionary[String, Variant] = {
 	node_minimize_button = false,
 	node_close_button = false,
 	touch_node_actions = true,
+	touch_optimization = true,
 	ui_3d_preview_resolution = 1.0,
 }
 
