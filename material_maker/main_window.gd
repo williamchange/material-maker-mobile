@@ -1701,9 +1701,10 @@ func android_process_doc_path(doc_dir : String, doc_name : String) -> String:
 	const mappings : Dictionary[String, String] = {
 		"miscellaneous_aperture_in": "aperture_nodes",
 		"miscellaneous_aperture_out": "aperture_nodes",
+		"miscellaneous_aperture": "aperture_nodes",
 		"miscellaneous_reroute": "reroute_nodes",
 		"miscellaneous": "miscellaneous_nodes",
-		"wofkflow": "nodes_workflow",
+		"workflow": "nodes_workflow",
 		"transform": "nodes_transform",
 		"filter": "nodes_filter",
 		"noise": "nodes_noise",
