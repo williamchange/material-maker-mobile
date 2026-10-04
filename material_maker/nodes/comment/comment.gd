@@ -134,7 +134,7 @@ func _on_text_focus_exited():
 # Comment color
 
 func _on_change_color_pressed():
-	var light_theme = mm_globals.current_theme == mm_globals.DEFAULT_LIGHT_THEME
+	var light_theme = mm_globals.current_theme == mm_globals.DEFAULT_LIGHT
 	accept_event()
 	var content_scale_factor : float = mm_globals.ui_scale_factor()
 	$Popup.get_window().content_scale_factor = content_scale_factor
