@@ -78,6 +78,7 @@ func _on_ready() -> void:
 	%WinTabletDriverSpacer.visible = OS.get_name() == "Windows"
 	%GuiSingleWindowMode.visible = OS.get_name() != "Android"
 	%GuiUseNativeFileDialogs.visible = OS.get_name() != "Android"
+	%TouchFullScreen.visible = OS.get_name() == "Android"
 
 	if OS.get_name() == "Android":
 		config_changed.connect(mm_touch.make_dialog_fullscreen.bind(self),

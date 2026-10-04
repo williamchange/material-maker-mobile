@@ -10,6 +10,8 @@ func _on_ready() -> void:
 	for node in get_children(true):
 		if node is VScrollBar:
 			tree_scrollbar = node
+	if mm_globals.get_config("touch_optimization"):
+		%Tree.add_theme_constant_override("v_separation", 4)
 
 func get_last_item(parent : TreeItem):
 	while true:
