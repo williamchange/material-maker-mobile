@@ -161,7 +161,7 @@ func _on_Cancel_pressed() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED:
-		match mm_globals.current_theme:
+		match mm_globals.current_theme():
 			mm_globals.DEFAULT_DARK:
 				$BG.color = Color("0b0b0c")
 			mm_globals.CLASSIC:

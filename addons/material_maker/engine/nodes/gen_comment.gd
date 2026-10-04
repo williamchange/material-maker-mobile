@@ -16,7 +16,7 @@ func _ready() -> void:
 	if !parameters.has("size"):
 		parameters.size = 4
 	if color == null:
-		if mm_globals.current_theme == mm_globals.DEFAULT_LIGHT:
+		if mm_globals.current_theme() == mm_globals.DEFAULT_LIGHT:
 			color = Color.WHITE
 		else:
 			color = Color.BLACK

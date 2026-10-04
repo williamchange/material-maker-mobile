@@ -251,7 +251,7 @@ func update_stylebox() -> void:
 	if not sb_selection:
 		init_stylebox()
 
-	match mm_globals.current_theme:
+	match mm_globals.current_theme():
 		mm_globals.CLASSIC:
 			sb_selection.bg_color = Color(0.204, 0.231, 0.31)
 			sb_selection.border_color = Color(0.325, 0.463, 0.682)
