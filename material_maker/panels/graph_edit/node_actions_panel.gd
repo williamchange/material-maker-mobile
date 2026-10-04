@@ -9,6 +9,7 @@ const BUTTON_SIZE : Vector2 = Vector2(16, 16)
 const H_PAD : int = 16
 const AREA_PAD : int = 24
 const PADDING : Vector2 = Vector2(AREA_PAD + H_PAD, -AREA_PAD)
+const AVOID_PAD : int = 12
 
 var parent : MMGraphEdit
 var selection_area : Rect2
@@ -34,7 +35,6 @@ func _ready() -> void:
 	setup_signals()
 
 	container = VBoxContainer.new()
-	container.minimum_size_changed.connect(set.bind("size", Vector2.ZERO))
 	add_child(container)
 	create_buttons()
 
@@ -65,7 +65,7 @@ func setup_signals() -> void:
 	parent.draw.connect(draw_selection_area)
 
 class ActionButton extends Button:
-	## Emitted when button is right clicked(long pressed for touch)
+	## Emitted when button is right clicked (long pressed for touch)
 	signal on_show_popup
 
 	func _gui_input(event : InputEvent) -> void:
@@ -119,11 +119,11 @@ func create_panel() -> void:
 		if not n.tree_exiting.is_connected(should_panel_update):
 			n.tree_exiting.connect(should_panel_update)
 
-	position = nodes_rect.get_support(Vector2(1, -1))
+	global_position = nodes_rect.get_support(Vector2(1, -1)) + parent.global_position
 
 	if selected_nodes.size() == 1:
 		selection_area = Rect2()
-		position.x += AREA_PAD
+		global_position.x += AREA_PAD
 
 		var node : GraphElement = selected_nodes[0]
 		var gen : MMGenBase = node.generator
@@ -138,10 +138,11 @@ func create_panel() -> void:
 				buttons.custom.show()
 				buttons.custom.connect_actions(node_switch_edit.bind(node))
 
-		if is_node_center_panel(node):
-			position = node.position
-			position.x += node.size.x * 0.5 * parent.zoom - size.x - 6
-			position.y += (node.size.y + H_PAD) * parent.zoom
+			if should_node_panel_center(node):
+				var local_p : Vector2 = node.position
+				local_p.x += node.size.x * 0.5 * parent.zoom - size.x - 6.0
+				local_p.y += (node.size.y + H_PAD) * parent.zoom
+				global_position = parent.global_position + local_p
 		else:
 			buttons.close.visible = should_close_visible(gen)
 			buttons.randomize.visible = should_random_visible(gen)
@@ -154,7 +155,7 @@ func create_panel() -> void:
 
 	elif selected_nodes.size() > 1:
 		selection_area = nodes_rect
-		position += PADDING
+		global_position += PADDING
 
 		buttons.close.visible = node_selection_can_be_deleted()
 		buttons.randomize.visible = node_selection_has_randomness()
@@ -163,10 +164,10 @@ func create_panel() -> void:
 
 		buttons.randomize.connect_actions(randomize_selected_nodes)
 
-	size = Vector2.ZERO
+	size = get_combined_minimum_size()
 
-	set_top_level()
 	avoid_intersecting_popups()
+	set_top_level()
 	show_panel()
 
 func is_node_simple(node : GraphElement) -> bool:
@@ -174,36 +175,40 @@ func is_node_simple(node : GraphElement) -> bool:
 			MMGraphCommentLine, MMGraphSwitch, MMGraphComment,
 			MMGraphDebug, MMGraphNodeRemote ]
 
-func is_node_center_panel(node : GraphElement) -> bool:
+func should_node_panel_center(node : GraphElement) -> bool:
 	return node.get_script() in [ MMGraphPortal, MMGraphReroute,
 			MMGraphCommentLine ]
 
 func set_top_level() -> void:
-	# keep top-level behavior only within graph
-	position += parent.global_position
-	top_level = parent.get_global_rect().encloses(get_rect())
-	if not top_level:
-		position -= parent.global_position
+	# keep top level and have panel visible only within graph
+	var prev : Vector2 = global_position
+	top_level = parent.get_global_rect().encloses(get_global_rect())
+	global_position = prev
+
+var _gradient_edits : Array[Node]
 
 func avoid_intersecting_popups() -> void:
 	# avoid intersecting with GradientEdit's popup
-	if not selected_nodes.size() == 1 or not selected_nodes[0]:
+	if selected_nodes.size() != 1 or not selected_nodes[0]:
 		return
-	var node : MMGraphNodeMinimal = selected_nodes[0]
+	var node : GraphElement = selected_nodes[0]
 	var popup : GradientPopup
 
-	for c in node.controls:
-		if (node.controls[c] is GradientEdit
-				and node.controls[c] and is_instance_valid(node.controls[c].popup)):
-			popup = node.controls[c].popup
+	var edits : Array[Node] = node.find_children("*", "GradientEdit", true, false)
+	if edits.hash() != _gradient_edits.hash():
+		_gradient_edits = edits
+
+	for edit in _gradient_edits:
+		if edit and is_instance_valid(edit.popup):
+			popup = edit.popup
 			break
+
 	if not popup:
 		return
-
 	var panel_r : Rect2 = get_global_rect()
 	var popup_r : Rect2 = popup.get_global_rect()
 	if panel_r.intersects(popup_r):
-		global_position.y = popup_r.position.y - panel_r.size.y
+		global_position.y = popup_r.position.y - panel_r.size.y - AVOID_PAD
 
 func should_panel_update() -> void:
 	if is_updating:
