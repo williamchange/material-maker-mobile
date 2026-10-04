@@ -134,8 +134,10 @@ enum WinTabletDriver { WININK, WINTAB, DISABLED }
 func _enter_tree() -> void:
 	mm_globals.main_window = self
 	if OS.get_name() == "Android":
-		android_setup_status_bar()
 		ready.connect(android_setup_margins)
+
+	if mm_globals.get_config("touch_optimization"):
+		android_setup_status_bar()
 
 func _ready() -> void:
 	get_window().borderless = false
