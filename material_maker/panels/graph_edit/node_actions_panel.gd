@@ -9,6 +9,7 @@ const BUTTON_SIZE : Vector2 = Vector2(16, 16)
 const H_PAD : int = 16
 const AREA_PAD : int = 24
 const PADDING : Vector2 = Vector2(AREA_PAD + H_PAD, -AREA_PAD)
+const AVOID_PAD : int = 12
 
 var parent : MMGraphEdit
 var selection_area : Rect2
@@ -34,7 +35,6 @@ func _ready() -> void:
 	setup_signals()
 
 	container = VBoxContainer.new()
-	container.minimum_size_changed.connect(set.bind("size", Vector2.ZERO))
 	add_child(container)
 	create_buttons()
 
@@ -140,10 +140,9 @@ func create_panel() -> void:
 
 			if should_node_panel_center(node):
 				var local_p : Vector2 = node.position
-				local_p.x += node.size.x * 0.5 * parent.zoom - size.x - 6
+				local_p.x += node.size.x * 0.5 * parent.zoom - size.x - 6.0
 				local_p.y += (node.size.y + H_PAD) * parent.zoom
 				global_position = parent.global_position + local_p
-
 		else:
 			buttons.close.visible = should_close_visible(gen)
 			buttons.randomize.visible = should_random_visible(gen)
@@ -169,7 +168,6 @@ func create_panel() -> void:
 
 	avoid_intersecting_popups()
 	set_top_level()
-
 	show_panel()
 
 func is_node_simple(node : GraphElement) -> bool:
@@ -190,11 +188,10 @@ func set_top_level() -> void:
 var _gradient_edits : Array[Node]
 
 func avoid_intersecting_popups() -> void:
-	if not (selected_nodes.size() == 1 and not selected_nodes[0]):
-		return
-
 	# avoid intersecting with GradientEdit's popup
-	var node : MMGraphNodeMinimal = selected_nodes[0]
+	if selected_nodes.size() != 1 or not selected_nodes[0]:
+		return
+	var node : GraphElement = selected_nodes[0]
 	var popup : GradientPopup
 
 	var edits : Array[Node] = node.find_children("*", "GradientEdit", true, false)
@@ -205,13 +202,13 @@ func avoid_intersecting_popups() -> void:
 		if edit and is_instance_valid(edit.popup):
 			popup = edit.popup
 			break
+
 	if not popup:
 		return
-
 	var panel_r : Rect2 = get_global_rect()
 	var popup_r : Rect2 = popup.get_global_rect()
 	if panel_r.intersects(popup_r):
-		global_position.y = popup_r.position.y - panel_r.size.y
+		global_position.y = popup_r.position.y - panel_r.size.y - AVOID_PAD
 
 func should_panel_update() -> void:
 	if is_updating:
