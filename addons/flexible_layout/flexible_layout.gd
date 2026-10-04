@@ -109,7 +109,7 @@ class FlexSplit:
 	var draggers : Array[Control] = []
 	
 	const DRAGGER_SCENE = preload("res://addons/flexible_layout/flexible_dragger.tscn")
-	var grip_size : int = 4 if OS.get_name() == "Android" else 10
+	var grip_size : int = 4 if mm_globals.get_config("touch_optimization") else 10
 
 	func _init(p : FlexNode, fl : FlexLayout):
 		super._init(p, fl, "FlexSplit")

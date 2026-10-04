@@ -86,7 +86,7 @@ func _get_data_preview() -> Dictionary:
 			preview = Label.new()
 			preview.text = data.tree_item
 
-		if OS.get_name() == "Android":
+		if mm_globals.get_config("touch_optimization"):
 			var offset : Vector2 = Vector2.ZERO
 			preview.scale = Vector2(1.5, 1.5)
 			offset = preview_texture.get_size() if preview_texture else preview.size
