@@ -65,7 +65,7 @@ func setup_signals() -> void:
 	parent.draw.connect(draw_selection_area)
 
 class ActionButton extends Button:
-	## Emitted when button is right clicked(long pressed for touch)
+	## Emitted when button is right clicked (long pressed for touch)
 	signal on_show_popup
 
 	func _gui_input(event : InputEvent) -> void:
