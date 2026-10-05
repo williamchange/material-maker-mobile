@@ -236,7 +236,7 @@ func do_start_ui(scene : PackedScene):
 		add_child(dialog)
 		await dialog.ask()
 	
-	get_tree().change_scene_to_packed(scene)
+	#get_tree().change_scene_to_packed(scene)
 
 var wait : float = 0.0
 func _process(delta) -> void:
@@ -297,27 +297,28 @@ func _on_url_gui_input(event):
 #region android-specific utilities
 
 func android_setup_margins() -> void:
+	await get_tree().process_frame
 	var scale_fac : float = get_window().content_scale_factor
 
 	custom_minimum_size = Vector2.ZERO
 	$SplashScreen.custom_minimum_size = Vector2.ZERO
+	var nine_patch : NinePatchRect = $SplashScreen/TextureRect/LogoExtend
+	var logo : TextureRect = $SplashScreen/TextureRect
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-	var safe_margin_left : float = mm_touch.calc_margins(SIDE_LEFT, scale_fac)
-	var safe_margin_right : float = mm_touch.calc_margins(SIDE_RIGHT, scale_fac)
+	var safe_margin_left : int = mm_touch.calc_margins(SIDE_LEFT, scale_fac)
+	var safe_margin_right : int = mm_touch.calc_margins(SIDE_RIGHT, scale_fac)
 
-	if mm_globals.get_config("touch_full_screen"):
-		## url / artwork details margins
-		$MarginContainer.add_theme_constant_override("margin_left", safe_margin_left)
-		$MarginContainer.add_theme_constant_override("margin_right", safe_margin_right)
-	else:
-		## splash container margins
-		@warning_ignore_start("narrowing_conversion")
-		add_theme_constant_override("margin_left", safe_margin_left)
-		add_theme_constant_override("margin_right", safe_margin_right)
-		@warning_ignore_restore("narrowing_conversion")
-		$MarginContainer.add_theme_constant_override("margin_left", 10)
-		$MarginContainer.add_theme_constant_override("margin_right", 10)
+	# url / artwork details margins
+	$MarginContainer.add_theme_constant_override("margin_left", safe_margin_left)
+	$MarginContainer.add_theme_constant_override("margin_right", safe_margin_right)
+
+	# keep logo/progress bar within safe area
+	logo.position.x += safe_margin_left
+	nine_patch.position.x -= safe_margin_left
+	nine_patch.patch_margin_left = safe_margin_left + 4
+	progress_bar.position.x -= safe_margin_left
+	progress_bar.size.x += safe_margin_left
 
 func android_filter_splash_screens() -> void:
 	# filter animated shaders
