@@ -348,6 +348,7 @@ func create_button(pressed_callback : Callable = Callable()) -> ActionButton:
 	button.custom_minimum_size = BUTTON_SIZE
 	button.flat = true
 	button.expand_icon = true
+	button.add_theme_color_override("icon_hover_color", Color.WHITE)
 	if pressed_callback != Callable():
 		button.pressed.connect(pressed_callback)
 	container.add_child(button)
