@@ -90,18 +90,19 @@ func setup_dialog(window : Window) -> void:
 	window.show()
 
 ## Get display safe margins accounting for cutouts and corner radii.
-func calc_margins(side : Side) -> int:
-	var top : int = cutout_margins(SIDE_TOP)
-	var bottom : int = cutout_margins(SIDE_BOTTOM)
+## [param side] can be either Side.SIDE_LEFT or Side.SIDE_RIGHT
+func calc_margins(side : Side, scale : float = mm_globals.get_ui_scale()) -> int:
+	var top : int = cutout_margins(SIDE_TOP, scale)
+	var bottom : int = cutout_margins(SIDE_BOTTOM, scale)
 	match side:
 		Side.SIDE_LEFT:
-			var top_left : int = _inset(corner_radius(CORNER_TOP_LEFT), top)
-			var bottom_left : int = _inset(corner_radius(CORNER_BOTTOM_LEFT), bottom)
-			return maxi(maxi(top_left, bottom_left),  cutout_margins(SIDE_LEFT))
+			var top_left : int = _inset(corner_radius(CORNER_TOP_LEFT, scale), top)
+			var bottom_left : int = _inset(corner_radius(CORNER_BOTTOM_LEFT, scale), bottom)
+			return maxi(maxi(top_left, bottom_left),  cutout_margins(SIDE_LEFT, scale))
 		Side.SIDE_RIGHT:
-			var top_right : int = _inset(corner_radius(CORNER_TOP_RIGHT), top)
-			var bottom_right : int = _inset(corner_radius(CORNER_BOTTOM_RIGHT), bottom)
-			return maxi(maxi(top_right, bottom_right), cutout_margins(SIDE_RIGHT))
+			var top_right : int = _inset(corner_radius(CORNER_TOP_RIGHT, scale), top)
+			var bottom_right : int = _inset(corner_radius(CORNER_BOTTOM_RIGHT, scale), bottom)
+			return maxi(maxi(top_right, bottom_right), cutout_margins(SIDE_RIGHT, scale))
 	return 0
 
 func setup_margins(container : MarginContainer, margin_offset_left : int,
