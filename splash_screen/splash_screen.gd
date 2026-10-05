@@ -297,20 +297,35 @@ func _on_url_gui_input(event):
 
 func android_setup_margins() -> void:
 	var ui_scale : float = _ui_scale()
-	const padding : int = 10
+	const inner_padding : int = 10
+
 	custom_minimum_size = Vector2.ZERO
 	$SplashScreen.custom_minimum_size = Vector2.ZERO
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	@warning_ignore_start("narrowing_conversion")
+	var safe_margin_left : int = mm_touch.calc_margins(SIDE_LEFT) / ui_scale + inner_padding
+	var safe_margin_right : int = mm_touch.calc_margins(SIDE_RIGHT) / ui_scale + inner_padding
+
 	if not mm_globals.get_config("touch_full_screen"):
-		add_theme_constant_override("margin_left", mm_touch.cutout_margins(SIDE_LEFT, ui_scale))
-		add_theme_constant_override("margin_bottom", mm_touch.cutout_margins(SIDE_BOTTOM, ui_scale))
-		add_theme_constant_override("margin_top", mm_touch.cutout_margins(SIDE_TOP, ui_scale))
-		add_theme_constant_override("margin_top", mm_touch.cutout_margins(SIDE_RIGHT, ui_scale))
+		# need to account for applied margins for inner items
+		var final_left : int = maxi(mm_touch.cutout_margins(SIDE_LEFT, ui_scale) - safe_margin_left, 0.0)
+		var final_right : int = maxi( mm_touch.cutout_margins(SIDE_RIGHT, ui_scale) - safe_margin_right, 0.0)
+
+		# url / artwork details margins
+		$MarginContainer.add_theme_constant_override("margin_left", final_left)
+		$MarginContainer.add_theme_constant_override("margin_right", final_right)
+
+		# splash container margins
+		add_theme_constant_override("margin_left", safe_margin_left)
+		add_theme_constant_override("margin_right", safe_margin_right)
+		add_theme_constant_override("margin_bottom", mm_touch.calc_margins(SIDE_BOTTOM) / ui_scale)
+		add_theme_constant_override("margin_top", mm_touch.calc_margins(SIDE_TOP) / ui_scale)
+		@warning_ignore_restore("narrowing_conversion")
 	else:
-		$MarginContainer.add_theme_constant_override(
-				"margin_right", mm_touch.calc_margins(SIDE_RIGHT) / ui_scale + padding)
-		$MarginContainer.add_theme_constant_override(
-				"margin_left", mm_touch.calc_margins(SIDE_LEFT) / ui_scale + padding)
+		# url / artwork details margins
+		$MarginContainer.add_theme_constant_override("margin_left", safe_margin_left)
+		$MarginContainer.add_theme_constant_override("margin_right", safe_margin_right)
 
 func android_filter_splash_screens() -> void:
 	# filter animated shaders
