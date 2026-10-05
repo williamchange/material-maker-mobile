@@ -1636,29 +1636,26 @@ func android_setup_status_bar() -> void:
 	var status_spacer : Control = Control.new()
 	status_spacer.name = "StatusBarSpacer"
 	status_bar_hbox.add_child(status_spacer)
-	mm_globals.preferences_updated.connect(android_update_status_margins.bind(status_spacer))
-	android_update_status_margins(status_spacer)
 
 	var menu_spacer : Control = Control.new()
 	menu_spacer.name = "MenuBarSpacer"
 	menu_bar_hbox.add_child(menu_spacer)
 	menu_bar_hbox.move_child(menu_spacer, 0)
-	mm_globals.preferences_updated.connect(android_update_menu_margins.bind(menu_spacer))
-	android_update_menu_margins(menu_spacer)
+
+	android_update_spacers(menu_spacer, status_spacer)
+	mm_globals.preferences_updated.connect(
+			android_update_spacers.bind(menu_spacer, status_spacer))
 
 	await status_bar_hbox.ready
 	status_bar_hbox.get_node("Tip").hide()
 	$MainContainer/VBoxContainer/StatusBar.hide()
 
-func android_update_menu_margins(spacer : Control) -> void:
-	android_set_menu_stautus_bar_margins(spacer, SIDE_LEFT, CORNER_TOP_RIGHT)
-	
-func android_update_status_margins(spacer : Control) -> void:
-	android_set_menu_stautus_bar_margins(spacer, SIDE_RIGHT, CORNER_BOTTOM_RIGHT)
+func android_update_spacers(menu : Control, status : Control) -> void:
+	android_update_spacer_margins(status, SIDE_RIGHT, CORNER_BOTTOM_RIGHT)
+	android_update_spacer_margins(menu, SIDE_LEFT, CORNER_TOP_RIGHT)
 
-func android_set_menu_stautus_bar_margins(spacer : Control,
+func android_update_spacer_margins(spacer : Control,
 		side : Side, corner : Corner) -> void:
-
 	var corner_reach : float = 0.0
 
 	# avoid screen corners
@@ -1669,8 +1666,10 @@ func android_set_menu_stautus_bar_margins(spacer : Control,
 		corner_reach /= mm_globals.get_ui_scale()
 
 	if mm_globals.get_config("touch_full_screen"):
+		DisplayServer.get_display_cutouts()
 		spacer.custom_minimum_size.x = corner_reach
 	else:
+		# account for main container's already-applied margins
 		spacer.custom_minimum_size.x = maxf(corner_reach - mm_touch.cutout_margins(side), 0.0)
 
 func android_set_theme_overrides(t : Theme) -> void:
@@ -1709,7 +1708,7 @@ func android_copy_examples(ext : String = "ptex") -> void:
 	dir.list_dir_end()
 
 func android_load_example_project() -> void:
-	const fd : String ="res://material_maker/windows/file_dialog/file_dialog.tscn"
+	const fd : String = "res://material_maker/windows/file_dialog/file_dialog.tscn"
 	var dialog : FileDialog = preload(fd).instantiate()
 	dialog.access = FileDialog.ACCESS_USERDATA
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILES

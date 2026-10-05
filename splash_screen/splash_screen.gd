@@ -301,11 +301,16 @@ func android_setup_margins() -> void:
 	custom_minimum_size = Vector2.ZERO
 	$SplashScreen.custom_minimum_size = Vector2.ZERO
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_theme_constant_override("margin_left", mm_touch.cutout_margins(SIDE_LEFT, ui_scale))
-	add_theme_constant_override("margin_bottom", mm_touch.cutout_margins(SIDE_BOTTOM, ui_scale))
-	add_theme_constant_override("margin_top", mm_touch.cutout_margins(SIDE_TOP, ui_scale))
-	$MarginContainer.add_theme_constant_override(
-			"margin_right", mm_touch.calc_margins(SIDE_RIGHT) / ui_scale + padding)
+	if not mm_globals.get_config("touch_full_screen"):
+		add_theme_constant_override("margin_left", mm_touch.cutout_margins(SIDE_LEFT, ui_scale))
+		add_theme_constant_override("margin_bottom", mm_touch.cutout_margins(SIDE_BOTTOM, ui_scale))
+		add_theme_constant_override("margin_top", mm_touch.cutout_margins(SIDE_TOP, ui_scale))
+		add_theme_constant_override("margin_top", mm_touch.cutout_margins(SIDE_RIGHT, ui_scale))
+	else:
+		$MarginContainer.add_theme_constant_override(
+				"margin_right", mm_touch.calc_margins(SIDE_RIGHT) / ui_scale + padding)
+		$MarginContainer.add_theme_constant_override(
+				"margin_left", mm_touch.calc_margins(SIDE_LEFT) / ui_scale + padding)
 
 func android_filter_splash_screens() -> void:
 	# filter animated shaders

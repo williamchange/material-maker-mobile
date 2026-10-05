@@ -77,6 +77,7 @@ const DEFAULT_CONFIG : Dictionary = {
 	keep_screen_on = true,
 	touch_node_actions = false,
 	touch_optimization = false,
+	touch_full_screen = false,
 }
 
 const ANDROID_CONFIG : Dictionary[String, Variant] = {
@@ -84,7 +85,6 @@ const ANDROID_CONFIG : Dictionary[String, Variant] = {
 	node_close_button = false,
 	touch_node_actions = true,
 	touch_optimization = true,
-	ui_3d_preview_resolution = 1.0,
 }
 
 func _enter_tree() -> void:
@@ -288,7 +288,7 @@ func current_theme() -> int:
 		_:
 			return INVALID
 
-#region Android utilties
+#region android utilties
 
 ## Creates a toast message.
 ## [param duration] set to 0 displays the message for a short period of time.

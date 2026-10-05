@@ -3,8 +3,6 @@ extends Node
 
 ## basic touch handling and android utilities
 
-var touch_info : Dictionary[int, Vector2] = {}
-
 var _display_corner_radii : PackedInt32Array = PackedInt32Array([0, 0, 0, 0])
 var _dispalay_cutout_margins : PackedInt32Array = PackedInt32Array([0, 0, 0, 0])
 
@@ -34,16 +32,11 @@ var time_since_touch_down : int = -1:
 	get: return Time.get_ticks_msec() - _touch_start
 
 func _input(event : InputEvent) -> void:
-	if event is InputEventScreenDrag:
-		touch_info[event.index] = event.position
-	elif event is InputEventScreenTouch:
+	if event is InputEventScreenTouch:
 		if event.pressed:
 			_touch_start = Time.get_ticks_msec()
-			touch_info[event.index] = event.position
 		elif not event.pressed:
 			last_touch_duration_msec = Time.get_ticks_msec() - _touch_start
-			if touch_info.has(event.index):
-				touch_info.erase(event.index)
 
 func _notification(what : int) -> void:
 	match what:

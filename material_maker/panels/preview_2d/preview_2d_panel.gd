@@ -297,9 +297,6 @@ func _on_gui_input(event):
 			new_center = center-event.relative*view_scale/multiplier
 		elif zooming:
 			new_scale = clamp(new_scale*(1.0+0.01*event.relative.y), MIN_ZOOM, MAX_ZOOM)
-		elif event.device == InputEvent.DEVICE_ID_EMULATION:
-			if mm_touch.touch_info.size() == 1:
-				new_center = center-event.relative * view_scale/multiplier
 	elif event is InputEventMagnifyGesture:
 		magnifying = true
 		new_scale = clampf(new_scale / event.factor, MIN_ZOOM, MAX_ZOOM)
@@ -307,6 +304,8 @@ func _on_gui_input(event):
 		# two-finger tap: center view
 		if not event.pressed and mm_touch.last_touch_duration_msec < 80:
 			reset_view.call_deferred()
+	elif event is InputEventScreenDrag and event.index == 0:
+		new_center = center-event.relative * view_scale/multiplier
 	else:
 		magnifying = false
 	if new_scale != view_scale:

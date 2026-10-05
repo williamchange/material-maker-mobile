@@ -215,6 +215,8 @@ func handle_movement(event : InputEvent) -> void:
 			new_scale = clamp(new_scale*(1.0+0.01*event.relative.y), 0.005, 3)
 	elif event is InputEventMagnifyGesture:
 		new_scale = clamp(new_scale / event.factor, 0.005, 3)
+	elif event is InputEventScreenDrag and event.index == 0:
+		new_center = m.get_shader_parameter("center")-event.relative*image_scale/multiplier
 
 	if new_scale != image_scale:
 		m.set_shader_parameter("scale", new_scale)
