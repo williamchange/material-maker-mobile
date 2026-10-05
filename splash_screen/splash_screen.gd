@@ -132,6 +132,7 @@ func _enter_tree():
 	window.content_scale_factor = ui_scale
 	if OS.get_name() == "Android":
 		android_setup_margins()
+		android_setup_artwork_details_size()
 		$SplashScreen.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	else:
 		var current_screen_index = window.current_screen
@@ -236,7 +237,7 @@ func do_start_ui(scene : PackedScene):
 		add_child(dialog)
 		await dialog.ask()
 	
-	#get_tree().change_scene_to_packed(scene)
+	get_tree().change_scene_to_packed(scene)
 
 var wait : float = 0.0
 func _process(delta) -> void:
@@ -296,6 +297,11 @@ func _on_url_gui_input(event):
 
 #region android-specific utilities
 
+func android_setup_artwork_details_size() -> void:
+	%URL.add_theme_font_size_override("font_size", 14)
+	%Title.add_theme_font_size_override("font_size", 22)
+	%Author.add_theme_font_size_override("font_size", 22)
+
 func android_setup_margins() -> void:
 	await get_tree().process_frame
 	var scale_fac : float = get_window().content_scale_factor
@@ -312,6 +318,7 @@ func android_setup_margins() -> void:
 	# url / artwork details margins
 	$MarginContainer.add_theme_constant_override("margin_left", safe_margin_left)
 	$MarginContainer.add_theme_constant_override("margin_right", safe_margin_right)
+	$MarginContainer.add_theme_constant_override("margin_bottom", 12)
 
 	# keep logo/progress bar within safe area
 	logo.position.x += safe_margin_left
