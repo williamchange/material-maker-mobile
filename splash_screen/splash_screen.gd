@@ -103,8 +103,6 @@ const ACTIVITY_MESSAGES : Array[String] = [
 func _enter_tree():
 	if OS.get_name() == "Android":
 		android_filter_splash_screens()
-		android_setup_margins()
-		$SplashScreen.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	var date : Dictionary = Time.get_date_dict_from_system()
 	var date_int : int = date.month*33+date.day
 	var screen : int = 0
@@ -132,7 +130,10 @@ func _enter_tree():
 	var window : Window = get_window()
 	var ui_scale : int = _ui_scale()
 	window.content_scale_factor = ui_scale
-	if OS.get_name() != "Android":
+	if OS.get_name() == "Android":
+		android_setup_margins()
+		$SplashScreen.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	else:
 		var current_screen_index = window.current_screen
 		@warning_ignore("integer_division")
 		window.position = (DisplayServer.screen_get_size(current_screen_index)-Vector2i(ui_scale*size))/2 + DisplayServer.screen_get_position(current_screen_index)
@@ -235,7 +236,7 @@ func do_start_ui(scene : PackedScene):
 		add_child(dialog)
 		await dialog.ask()
 	
-	get_tree().change_scene_to_packed(scene)
+	#get_tree().change_scene_to_packed(scene)
 
 var wait : float = 0.0
 func _process(delta) -> void:
@@ -296,36 +297,28 @@ func _on_url_gui_input(event):
 #region android-specific utilities
 
 func android_setup_margins() -> void:
-	var ui_scale : float = _ui_scale()
-	const inner_padding : int = 10
+	await get_tree().process_frame
+	var scale_fac : float = get_window().content_scale_factor
 
 	custom_minimum_size = Vector2.ZERO
 	$SplashScreen.custom_minimum_size = Vector2.ZERO
+	var nine_patch : NinePatchRect = $SplashScreen/TextureRect/LogoExtend
+	var logo : TextureRect = $SplashScreen/TextureRect
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-	@warning_ignore_start("narrowing_conversion")
-	var safe_margin_left : int = mm_touch.calc_margins(SIDE_LEFT) / ui_scale + inner_padding
-	var safe_margin_right : int = mm_touch.calc_margins(SIDE_RIGHT) / ui_scale + inner_padding
+	var safe_margin_left : int = mm_touch.calc_margins(SIDE_LEFT, scale_fac)
+	var safe_margin_right : int = mm_touch.calc_margins(SIDE_RIGHT, scale_fac)
 
-	if not mm_globals.get_config("touch_full_screen"):
-		# need to account for applied margins for inner items
-		var final_left : int = maxi(mm_touch.cutout_margins(SIDE_LEFT, ui_scale) - safe_margin_left, 0.0)
-		var final_right : int = maxi( mm_touch.cutout_margins(SIDE_RIGHT, ui_scale) - safe_margin_right, 0.0)
+	# url / artwork details margins
+	$MarginContainer.add_theme_constant_override("margin_left", safe_margin_left)
+	$MarginContainer.add_theme_constant_override("margin_right", safe_margin_right)
 
-		# url / artwork details margins
-		$MarginContainer.add_theme_constant_override("margin_left", final_left)
-		$MarginContainer.add_theme_constant_override("margin_right", final_right)
-
-		# splash container margins
-		add_theme_constant_override("margin_left", safe_margin_left)
-		add_theme_constant_override("margin_right", safe_margin_right)
-		add_theme_constant_override("margin_bottom", mm_touch.calc_margins(SIDE_BOTTOM) / ui_scale)
-		add_theme_constant_override("margin_top", mm_touch.calc_margins(SIDE_TOP) / ui_scale)
-		@warning_ignore_restore("narrowing_conversion")
-	else:
-		# url / artwork details margins
-		$MarginContainer.add_theme_constant_override("margin_left", safe_margin_left)
-		$MarginContainer.add_theme_constant_override("margin_right", safe_margin_right)
+	# keep logo/progress bar within safe area
+	logo.position.x += safe_margin_left
+	nine_patch.position.x -= safe_margin_left
+	nine_patch.patch_margin_left = safe_margin_left + 4
+	progress_bar.position.x -= safe_margin_left
+	progress_bar.size.x += safe_margin_left
 
 func android_filter_splash_screens() -> void:
 	# filter animated shaders

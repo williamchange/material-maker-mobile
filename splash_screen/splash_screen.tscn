@@ -53,9 +53,17 @@ expand_mode = 1
 [node name="TextureRect" type="TextureRect" parent="SplashScreen" unique_id=547599219]
 layout_mode = 0
 offset_top = 34.0
-offset_right = 500.0
-offset_bottom = 177.0
+offset_right = 503.00006
+offset_bottom = 178.0
 texture = ExtResource("2_uba88")
+
+[node name="LogoExtend" type="NinePatchRect" parent="SplashScreen/TextureRect" unique_id=512569899]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+grow_vertical = 2
+texture = ExtResource("2_uba88")
+region_rect = Rect2(0, 0, 25, 144)
 
 [node name="MM" type="Label" parent="SplashScreen/TextureRect" unique_id=1234938026]
 layout_mode = 0
