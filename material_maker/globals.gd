@@ -85,6 +85,7 @@ const ANDROID_CONFIG : Dictionary[String, Variant] = {
 	node_close_button = false,
 	touch_node_actions = true,
 	touch_optimization = true,
+	touch_full_screen = true,
 }
 
 func _enter_tree() -> void:
