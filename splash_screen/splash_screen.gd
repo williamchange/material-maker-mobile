@@ -295,7 +295,7 @@ func _on_url_gui_input(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		OS.shell_open("https://www.materialmaker.org")
 
-#region android-specific utilities
+#region android-specific
 
 func android_setup_artwork_details_size() -> void:
 	%URL.add_theme_font_size_override("font_size", 14)
