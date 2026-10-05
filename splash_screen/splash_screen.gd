@@ -327,7 +327,6 @@ func android_setup_margins() -> void:
 		$MarginContainer.add_theme_constant_override("margin_left", safe_margin_left)
 		$MarginContainer.add_theme_constant_override("margin_right", safe_margin_right)
 
-
 func android_filter_splash_screens() -> void:
 	# filter animated shaders
 	var filtered_backgrounds : Array[Dictionary]
