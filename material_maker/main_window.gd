@@ -1684,7 +1684,6 @@ func android_set_theme_overrides(t : Theme) -> void:
 
 	t.set_constant("v_separation", "PopupMenu", 16)
 	t.set_constant("v_separation", "ItemList", 16)
-	t.set_constant("v_separation", "MM_AddNodePanelList", 16)
 	t.set_constant("resize_margin", "Window", 32)
 
 	t.set_stylebox("pressed", "Button", t.get_stylebox("hover_pressed", "Button"))
