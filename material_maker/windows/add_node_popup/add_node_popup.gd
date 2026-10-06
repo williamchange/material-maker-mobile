@@ -233,6 +233,10 @@ func _on_list_gui_input(event : InputEvent) -> void:
 	elif event is InputEventScreenTouch and event.index == 0:
 		var icon_width : float = get_icon_size().x + ICON_DRAG_MARGIN
 		dragging_from_icon = event.pressed and event.position.x < icon_width
+		if event.pressed:
+			%Filter.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		else:
+			%Filter.mouse_filter = Control.MOUSE_FILTER_STOP
 	elif event is InputEventScreenDrag and event.index == 0:
 		# allow drag to only occur on text
 		if event.position.x > get_icon_size().x + ICON_DRAG_MARGIN and not dragging_from_icon:
