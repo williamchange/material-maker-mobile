@@ -7,15 +7,7 @@ common touch gestures available in Material Maker for Android.
 In general, most desktop inputs can be mapped to
 touch inputs in the following manner:
 
-Destop Mapping
-++++++++++++++
-+-------------------------------------------------------+----------------------------------------------------+
-| Tap                                                   | Left Click                                         |
-+-------------------------------------------------------+----------------------------------------------------+
-| Double-Tap                                            | Left Double Click                                  |
-+-------------------------------------------------------+----------------------------------------------------+
-| Long-Press                                            | Right Click                                        |
-+-------------------------------------------------------+----------------------------------------------------+
+**Tap**: Left Click, **Double-Tap**: Left Double Click, **Long-Press**: Right Click
 
 Add Node Popup
 ++++++++++++++
@@ -39,7 +31,7 @@ Graph Editor
 +-------------------------------------------------------+----------------------------------------------------+
 | Double Tap                                            | Enters subgraph/nodegroup, or exit/go up a level   |
 |                                                       | in subgraph hierarchy when double-tapping in an    |
-|                                                       | empty area                                         |
+|                                                       | empty area.                                        |
 +-------------------------------------------------------+----------------------------------------------------+
 | Two-Finger Tap                                        | Undo                                               |
 +-------------------------------------------------------+----------------------------------------------------+
