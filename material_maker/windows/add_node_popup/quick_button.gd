@@ -43,9 +43,9 @@ func _drop_data(_position, data):
 
 func _on_gui_input(event):
 	if !disabled and event is InputEventMouseButton:
-		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and not event.canceled:
 			emit_signal("object_selected", library_item.item)
-		if not event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		elif event.button_index == MOUSE_BUTTON_RIGHT and not event.pressed:
 			set_library_item("")
 			disable()
 
