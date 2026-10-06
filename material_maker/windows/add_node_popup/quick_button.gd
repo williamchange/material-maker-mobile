@@ -20,6 +20,8 @@ func _ready():
 
 
 func _can_drop_data(_position, _data):
+	if OS.get_name() == "Android":
+		return _data != ""
 	return true
 
 
