@@ -230,9 +230,6 @@ func _on_list_gui_input(event : InputEvent) -> void:
 					event.device == InputEvent.DEVICE_ID_EMULATION:
 				return
 			activate_item_at_current_position()
-	elif event is InputEventPanGesture:
-		%List.accept_event()
-		return
 	elif event is InputEventScreenTouch and event.index == 0:
 		var icon_width : float = get_icon_size().x + ICON_DRAG_MARGIN
 		dragging_from_icon = event.pressed and event.position.x < icon_width
