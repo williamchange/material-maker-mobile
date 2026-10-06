@@ -45,8 +45,10 @@ func _on_gui_input(event):
 	if !disabled and event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and not (event.pressed or event.canceled):
 			emit_signal("object_selected", library_item.item)
-		elif event.button_index == MOUSE_BUTTON_RIGHT and not event.pressed:
+		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			set_library_item("")
+			if OS.get_name() == "Android":
+				mm_globals.android_make_toast("Item cleared.")
 			disable()
 
 func enable() -> void:
