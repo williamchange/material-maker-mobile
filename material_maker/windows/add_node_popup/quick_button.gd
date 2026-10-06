@@ -45,7 +45,7 @@ func _on_gui_input(event):
 	if !disabled and event is InputEventMouseButton:
 		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			emit_signal("object_selected", library_item.item)
-		if event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		if not event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 			set_library_item("")
 			disable()
 
