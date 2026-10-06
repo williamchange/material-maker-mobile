@@ -30,6 +30,7 @@ title = "Easy SDF"
 position = Vector2i(0, 36)
 exclusive = true
 script = ExtResource("3")
+metadata/android_fullscreen_dim = true
 
 [node name="TopContainer" type="VBoxContainer" parent="." unique_id=1813903354]
 custom_minimum_size = Vector2(800, 400)
@@ -73,7 +74,7 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Right click to add shapes"
 
-[node name="Preview2D" parent="TopContainer/Main" unique_id=1959647637 instance=ExtResource("2")]
+[node name="Preview2D" parent="TopContainer/Main" instance=ExtResource("2")]
 unique_name_in_owner = true
 material = SubResource("ShaderMaterial_3ieba")
 layout_mode = 2

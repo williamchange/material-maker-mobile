@@ -250,7 +250,7 @@ func activate_item_at_current_position() -> void:
 
 func get_list_drag_data(m_position : Vector2) -> Variant:
 	if OS.get_name() == "Android":
-		if m_position.x > get_icon_size().x:
+		if m_position.x > get_icon_size().x + ICON_DRAG_MARGIN:
 			return ""
 
 	var data = %List.get_item_metadata(%List.get_item_at_position(m_position))

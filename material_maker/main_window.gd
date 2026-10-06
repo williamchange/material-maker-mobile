@@ -1242,7 +1242,7 @@ func _on_PaintEnvironment_id_pressed(id) -> void:
 
 func environment_editor() -> Node:
 	var env_editor : Node = load("res://material_maker/windows/environment_editor/environment_editor.tscn").instantiate()
-	add_dialog(env_editor, OS.get_name() == "Android")
+	add_dialog(env_editor)
 	return env_editor
 
 # -----------------------------------------------------------------------
@@ -1310,7 +1310,7 @@ func bug_report() -> void:
 
 func about() -> void:
 	var about_box : Window = preload("res://material_maker/windows/about/about.tscn").instantiate()
-	add_dialog(about_box, OS.get_name() == "Android")
+	add_dialog(about_box)
 
 func show_example_projects() -> void:
 	if OS.get_name() == "Android":
@@ -1559,18 +1559,15 @@ func _on_Tip_Timer_timeout():
 
 # Add dialog
 
-func add_dialog(dialog : Window, is_full_screen_dialog : bool = false) -> void:
-	if is_full_screen_dialog or mm_globals.get_config("dialog_dim_background"):
+func add_dialog(dialog : Window) -> void:
+	var opaque_dim : bool = mm_globals.should_dim_fullscreen(dialog)
+	if opaque_dim or mm_globals.get_config("dialog_dim_background"):
 		var bg : ColorRect = ColorRect.new()
 		bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 		bg.color = theme.get_stylebox("panel", "Panel").bg_color
-		bg.color.a = 1.0 if is_full_screen_dialog else 0.8
+		bg.color.a = 1.0 if opaque_dim else 0.8
 
-		if is_full_screen_dialog or OS.get_name() == "Android":
-			get_tree().root.add_child(bg)
-		else:
-			add_child(bg)
-
+		get_tree().root.add_child(bg)
 		dialog.tree_exited.connect(bg.queue_free)
 	add_child(dialog)
 

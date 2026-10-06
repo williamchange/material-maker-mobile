@@ -189,7 +189,7 @@ func _deserialize(data : Dictionary) -> void:
 func edit(node, tab : String = "") -> void:
 	if scene != null:
 		var edit_window : Window = load("res://material_maker/windows/sdf_builder/sdf_builder.tscn").instantiate()
-		mm_globals.main_window.add_dialog(edit_window, OS.get_name() == "Android")
+		mm_globals.main_window.add_dialog(edit_window)
 		edit_window.set_node_parameter_defs(node_parameters)
 		edit_window.set_sdf_scene(scene)
 		edit_window.connect("node_changed", Callable(node, "update_sdf_generator"))

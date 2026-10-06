@@ -47,7 +47,8 @@ func _ready():
 	content_scale_factor = mm_globals.ui_scale_factor()
 
 	if OS.get_name() == "Android":
-		mm_touch.setup_dialog(self)
+		mm_touch.make_dialog_fullscreen(self)
+		show()
 		$TopContainer/Main/Tree/AddMenuHint.text = "Tap and hold to add shapes"
 	else:
 		min_size = Vector2(800, 400) * content_scale_factor

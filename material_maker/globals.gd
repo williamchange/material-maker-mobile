@@ -9,7 +9,10 @@ var main_window : MainWindow
 signal preferences_updated
 
 
+<<<<<<< HEAD
 const INVALID : int = -1
+=======
+>>>>>>> mine/android
 const DEFAULT_DARK : int = 0
 const DEFAULT_LIGHT : int = 1
 const CLASSIC : int = 2
@@ -250,7 +253,11 @@ func get_home_directory() -> String:
 		"Android":
 			return "/storage/emulated/%s" % [ mm_globals.android_get_user_uid() ]
 		_:
+<<<<<<< HEAD
 			return "HOME"
+=======
+			return OS.get_environment("HOME")
+>>>>>>> mine/android
 
 func get_node_title_from_gen(generator : MMGenBase) -> String:
 	# Get GraphNode title from generator (in current graph)
@@ -279,7 +286,11 @@ func get_ui_scale() -> float:
 ## Returns current theme based on Main Window's theme resource path.
 func current_theme() -> int:
 	var t : String = main_window.theme.resource_path.get_file()
+<<<<<<< HEAD
 	match t.get_basename().get_file().to_lower():
+=======
+	match t.trim_suffix(".tres").to_lower():
+>>>>>>> mine/android
 		"default dark":
 			return DEFAULT_DARK
 		"default light":
@@ -287,7 +298,11 @@ func current_theme() -> int:
 		"classic":
 			return CLASSIC
 		_:
+<<<<<<< HEAD
 			return INVALID
+=======
+			return DEFAULT_DARK
+>>>>>>> mine/android
 
 #region android utilties
 
@@ -321,10 +336,14 @@ func android_move_task_to_back() -> void:
 func android_open_url(url : String) -> void:
 	# can't open url directly via shell_open
 	var b : Button = Button.new()
+	add_child(b)
 	b.pressed.connect(OS.shell_open.call_deferred.bind(url))
 	b.pressed.connect(b.queue_free)
 	b.modulate.a = 0
 	b.pressed.emit()
-	add_child(b)
+
+func should_dim_fullscreen(window : Window) -> bool:
+	const dim : String = "android_fullscreen_dim"
+	return OS.get_name() == "Android" and window.has_meta(dim) and window.get_meta(dim)
 
 #endregion

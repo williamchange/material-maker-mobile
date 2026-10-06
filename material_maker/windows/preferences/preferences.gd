@@ -11,13 +11,14 @@ func _unhandled_input(event: InputEvent) -> void:
 func edit_preferences(c : ConfigFile) -> void:
 	config = c
 	var main_window = mm_globals.main_window
-	main_window.add_dialog(self, OS.get_name() == "Android")
+	main_window.add_dialog(self)
 	config_changed.connect(mm_globals.preferences_updated.emit)
 	content_scale_factor = mm_globals.ui_scale_factor()
 	update_controls(self)
 
 	if OS.get_name() == "Android":
-		mm_touch.setup_dialog(self)
+		mm_touch.make_dialog_fullscreen(self)
+		show()
 	else:
 		size *= content_scale_factor
 		hide()

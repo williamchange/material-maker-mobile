@@ -16,7 +16,7 @@ signal removed(index)
 signal selected(index)
 
 func _ready() -> void:
-	if OS.get_name() == "Android":
+	if mm_globals.get_config("touch_optimization"):
 		offset_transform_scale = Vector2(2.5, 2.5)
 		offset_transform_visual_only = false
 		offset_transform_enabled = true

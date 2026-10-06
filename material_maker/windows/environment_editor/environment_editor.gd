@@ -35,7 +35,8 @@ func _ready():
 	if OS.get_name() == "Android":
 		min_size = Vector2.ZERO
 		$Main.custom_minimum_size = Vector2.ZERO
-		mm_touch.setup_dialog(self)
+		mm_touch.make_dialog_fullscreen(self)
+		show()
 	else:
 		hide()
 		popup_centered()
