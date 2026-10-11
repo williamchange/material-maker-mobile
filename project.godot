@@ -36,6 +36,7 @@ driver="Dummy"
 
 [autoload]
 
+mm_touch="*res://material_maker/touch.gd"
 mm_logger="*res://addons/material_maker/engine/logger.gd"
 mm_steam="*res://material_maker/steam.gd"
 mm_globals="*res://material_maker/globals.tscn"
@@ -45,7 +46,6 @@ mm_deps="*res://addons/material_maker/engine/dependencies.gd"
 mm_renderer="*res://addons/material_maker/engine/multi_renderer.gd"
 mm_sdf_builder="*res://addons/material_maker/sdf_builder/sdf_builder.tscn"
 mm_preprocessor="*res://addons/material_maker/engine/preprocessor.gd"
-mm_touch="*uid://uyvqjubc7arn"
 Html5="*res://material_maker/html5.gd"
 
 [debug]
