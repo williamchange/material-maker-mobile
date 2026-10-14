@@ -86,6 +86,7 @@ const ANDROID_CONFIG : Dictionary[String, Variant] = {
 	touch_node_actions = true,
 	touch_optimization = true,
 	touch_full_screen = true,
+	ui_3d_preview_generated_mesh = false,
 }
 
 func _enter_tree() -> void:
