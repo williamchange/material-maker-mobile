@@ -73,6 +73,7 @@ const DEFAULT_CONFIG : Dictionary = {
 	node_close_button = true,
 	ui_field_sensitivity = 1.0,
 	color_picker_floating = false,
+	ui_3d_preview_generated_mesh = true,
 	keep_screen_on = true,
 	touch_node_actions = false,
 	touch_optimization = false,

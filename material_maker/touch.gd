@@ -50,7 +50,7 @@ func _notification(what : int) -> void:
 
 			back_pressed.emit()
 
-			var main_window : MainWindow = get_node("/root/MainWindow")
+			var main_window : MainWindow = mm_globals.main_window
 			var exclude : PackedStringArray = PackedStringArray(["AddNodePopup"])
 			var windows : Array[Window]
 
