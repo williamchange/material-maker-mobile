@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://b6irr1ykhui6l" path="res://material_maker/windows/preferences/preferences_tree.gd" id="3_mlqij"]
 [ext_resource type="Script" uid="uid://gmystrme5ayw" path="res://material_maker/windows/preferences/lang_option.gd" id="4"]
 [ext_resource type="Script" uid="uid://d3h4xmek7b2vq" path="res://material_maker/windows/preferences/enum_option.gd" id="5_vp06c"]
+[ext_resource type="Script" uid="uid://c8mnypok072xm" path="res://material_maker/windows/preferences/preference_touch_hint.gd" id="8_btfio"]
 
 [node name="Preferences" type="Window" unique_id=906006602]
 oversampling_override = 1.0
@@ -395,7 +396,6 @@ layout_mode = 2
 [node name="Label" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/General/VBoxContainer/KeepScreenOn" unique_id=1745336321]
 layout_mode = 2
 size_flags_horizontal = 0
-tooltip_text = "Whether screen should stay on after a period of inactivity (based on OS settings)"
 mouse_filter = 1
 text = "Keep Screen On"
 
@@ -403,6 +403,7 @@ text = "Keep Screen On"
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 2
 size_flags_horizontal = 10
+tooltip_text = "Whether screen should stay on after a period of inactivity (based on OS settings)"
 text = "On"
 flat = false
 config_variable = "keep_screen_on"
@@ -691,6 +692,29 @@ tooltip_text = "When enabled, this extends the window towards screen edges."
 text = "On"
 flat = false
 config_variable = "touch_full_screen"
+
+[node name="PreferenceTouchHint" type="PanelContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer" unique_id=594747821]
+layout_mode = 2
+script = ExtResource("8_btfio")
+
+[node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/PreferenceTouchHint" unique_id=508458780]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer" type="ScrollContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/PreferenceTouchHint/MarginContainer" unique_id=1664878493]
+custom_minimum_size = Vector2(0, 60)
+custom_maximum_size = Vector2(-1, 60)
+layout_mode = 2
+
+[node name="TouchHintLabel" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/PreferenceTouchHint/MarginContainer/VBoxContainer" unique_id=1926624238]
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "This setting item does this and that."
+autowrap_mode = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer" unique_id=245791047]
 layout_mode = 2
