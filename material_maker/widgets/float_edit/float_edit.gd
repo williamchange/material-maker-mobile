@@ -40,7 +40,7 @@ var should_receive_input : bool = true
 
 var adjusting_sensitivity : bool = false
 var adjust_increment : float = 0.1
-static var sensitivity : float = mm_globals.get_config("ui_field_sensitivity")
+static var sensitivity : float = -1.0
 
 signal value_changed(value)
 signal value_changed_undo(value, merge_undo)
@@ -356,6 +356,10 @@ func _update_sensitivity(direction : float) -> void:
 
 func _exit_tree() -> void:
 	mm_globals.set_config("ui_field_sensitivity", sensitivity)
+
+func _enter_tree() -> void:
+	if sensitivity == -1.0:
+		sensitivity = mm_globals.get_config("ui_field_sensitivity")
 
 func _handle_sensitivity_adjustment(event : InputEvent) -> void:
 	if mode == Modes.SLIDING:
