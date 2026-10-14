@@ -5,6 +5,9 @@ var highlight : StyleBoxFlat
 var t : Tween
 
 func _ready() -> void:
+	if not OS.get_name() == "Android":
+		queue_free()
+		return
 	highlight = StyleBoxFlat.new()
 	highlight.set_corner_radius_all(4)
 	highlight.corner_detail = 3

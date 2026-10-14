@@ -694,6 +694,7 @@ flat = false
 config_variable = "touch_full_screen"
 
 [node name="PreferenceTouchHint" type="PanelContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer" unique_id=594747821]
+visible = false
 layout_mode = 2
 script = ExtResource("8_btfio")
 
