@@ -518,6 +518,13 @@ atlas = ExtResource("1_fw8f4")
 region = Rect2(16, 240, 16, 16)
 metadata/scale = 3.0
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_7b7js"]
+atlas = ExtResource("1_fw8f4")
+region = Rect2(48, 240, 16, 16)
+filter_clip = true
+metadata/scale = 2.0
+metadata/recolor = true
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_c7xvc"]
 atlas = ExtResource("1_fw8f4")
 region = Rect2(80, 32, 16, 16)
@@ -1249,6 +1256,7 @@ MM_Icons/icons/frequency_descending = SubResource("AtlasTexture_ya45l")
 MM_Icons/icons/function = SubResource("AtlasTexture_jxpkm")
 MM_Icons/icons/generic_size = SubResource("AtlasTexture_n4y2n")
 MM_Icons/icons/internet = SubResource("AtlasTexture_pbgus")
+MM_Icons/icons/knife = SubResource("AtlasTexture_7b7js")
 MM_Icons/icons/link = SubResource("AtlasTexture_c7xvc")
 MM_Icons/icons/lock_locked = SubResource("AtlasTexture_m27ao")
 MM_Icons/icons/lock_unlocked = SubResource("AtlasTexture_asgc8")
