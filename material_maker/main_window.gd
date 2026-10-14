@@ -341,8 +341,6 @@ func on_config_changed() -> void:
 				DisplayServer.tablet_set_current_driver("wintab")
 			WinTabletDriver.DISABLED:
 				DisplayServer.tablet_set_current_driver("dummy")
-	elif OS.get_name() == "Android":
-		android_setup_margins()
 
 	# update minimize/close button visibility
 	var graph_edit : MMGraphEdit = get_current_graph_edit()
