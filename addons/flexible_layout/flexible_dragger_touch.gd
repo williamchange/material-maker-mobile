@@ -58,10 +58,10 @@ func setup() -> void:
 	show()
 	if get_parent().vertical:
 		mouse_default_cursor_shape = Control.CURSOR_VSPLIT
-		custom_minimum_size = Vector2(45, 24)
+		custom_minimum_size = Vector2(52, 16)
 	else:
 		mouse_default_cursor_shape = Control.CURSOR_HSPLIT
-		custom_minimum_size = Vector2(24, 45)
+		custom_minimum_size = Vector2(16, 52)
 	update_theme_colors()
 	update_dragger_global_pos.call_deferred()
 
