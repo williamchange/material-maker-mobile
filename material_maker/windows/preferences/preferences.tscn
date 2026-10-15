@@ -304,6 +304,7 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [node name="Label" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/General/VBoxContainer/WinTabletDriver" unique_id=724900106]
+visible = false
 layout_mode = 2
 text = "Tablet Driver"
 
@@ -367,6 +368,7 @@ step = 1.0
 float_only = true
 
 [node name="IdleFPSLimit" type="HBoxContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/General/VBoxContainer" unique_id=918523289]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="Label" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/TabContainer/General/VBoxContainer/IdleFPSLimit" unique_id=34014532]
@@ -693,28 +695,28 @@ text = "On"
 flat = false
 config_variable = "touch_full_screen"
 
-[node name="PreferenceTouchHint" type="PanelContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer" unique_id=594747821]
+[node name="PreferenceTouchHint" type="PanelContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer" unique_id=328849096]
 visible = false
 layout_mode = 2
+theme_type_variation = &"MM_PanelBackground"
 script = ExtResource("8_btfio")
 
 [node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/PreferenceTouchHint" unique_id=508458780]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
 
-[node name="VBoxContainer" type="ScrollContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/PreferenceTouchHint/MarginContainer" unique_id=1664878493]
+[node name="ScrollContainer" type="ScrollContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer/PreferenceTouchHint/MarginContainer" unique_id=1664878493]
 custom_minimum_size = Vector2(0, 60)
 custom_maximum_size = Vector2(-1, 60)
 layout_mode = 2
 
-[node name="TouchHintLabel" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/PreferenceTouchHint/MarginContainer/VBoxContainer" unique_id=1926624238]
+[node name="TouchHintLabel" type="Label" parent="HSplitContainer/PreferencesPanel/VBoxContainer/PreferenceTouchHint/MarginContainer/ScrollContainer" unique_id=1926624238]
 custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-text = "This setting item does this and that."
 autowrap_mode = 3
 
 [node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/PreferencesPanel/VBoxContainer" unique_id=245791047]
