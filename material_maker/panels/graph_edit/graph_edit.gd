@@ -90,8 +90,10 @@ func _ready() -> void:
 
 	if mm_globals.get_config("touch_node_actions"):
 		node_actions_panel = NodeActionsPanel.new(self)
-		if OS.get_name() == "Android":
-			$GraphUI/ButtonReroll.hide()
+
+	if mm_globals.get_config("touch_optimization"):
+		$GraphUI/ButtonReroll.hide()
+		$GraphUI/ButtonShowTree.hide()
 
 func _exit_tree():
 	remove_crash_recovery_file()

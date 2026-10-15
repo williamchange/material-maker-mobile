@@ -76,8 +76,10 @@ func _on_DownloadLanguage_closed():
 func _on_ready() -> void:
 	%WinTabletDriver.visible = OS.get_name() == "Windows"
 	%WinTabletDriverSpacer.visible = OS.get_name() == "Windows"
+
 	%GuiSingleWindowMode.visible = OS.get_name() != "Android"
 	%GuiUseNativeFileDialogs.visible = OS.get_name() != "Android"
+	%IdleFPSLimit.visible = OS.get_name() != "Android"
 	%TouchFullScreen.visible = OS.get_name() == "Android"
 
 	if OS.get_name() == "Android":

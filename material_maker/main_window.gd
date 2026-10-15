@@ -341,8 +341,6 @@ func on_config_changed() -> void:
 				DisplayServer.tablet_set_current_driver("wintab")
 			WinTabletDriver.DISABLED:
 				DisplayServer.tablet_set_current_driver("dummy")
-	elif OS.get_name() == "Android":
-		android_setup_margins()
 
 	# update minimize/close button visibility
 	var graph_edit : MMGraphEdit = get_current_graph_edit()
@@ -1730,10 +1728,7 @@ func android_load_example_project() -> void:
 		do_load_project(files[0])
 
 func android_process_doc_path(doc_dir : String, doc_name : String) -> String:
-	const mappings : Dictionary[String, String] = {
-		"miscellaneous_aperture_in": "aperture_nodes",
-		"miscellaneous_aperture_out": "aperture_nodes",
-		"miscellaneous_aperture": "aperture_nodes",
+	const maps : Dictionary[String, String] = {
 		"miscellaneous_reroute": "reroute_nodes",
 		"miscellaneous": "miscellaneous_nodes",
 		"workflow": "nodes_workflow",
@@ -1744,8 +1739,17 @@ func android_process_doc_path(doc_dir : String, doc_name : String) -> String:
 		"3d": "nodes_3d",
 		"simple": "nodes_simple",
 	}
-	if mappings.has(doc_name):
-		return doc_dir.path_join(mappings[doc_name]+".html")
+
+	const prefix : Dictionary[String, String] = {
+		"miscellaneous_aperture": "aperture_nodes"
+	}
+
+	for p in prefix.keys():
+		if doc_name.begins_with(p):
+			return doc_dir.path_join(prefix[p]+".html")
+
+	if maps.has(doc_name):
+		return doc_dir.path_join(maps[doc_name]+".html")
 	return doc_dir+"/node_"+doc_name+".html"
 
 #endregion
