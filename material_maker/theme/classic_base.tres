@@ -470,7 +470,7 @@ region = Rect2(0, 64, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_l22ac"]
 atlas = ExtResource("1_fw8f4")
-region = Rect2(80, 240, 16, 16)
+region = Rect2(96, 240, 16, 16)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_oy0ko"]
 atlas = ExtResource("1_fw8f4")
@@ -549,7 +549,7 @@ metadata/scale = 3.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_fh3ks"]
 atlas = ExtResource("1_fw8f4")
-region = Rect2(64, 240, 16, 16)
+region = Rect2(80, 240, 16, 16)
 metadata/scale = 2.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dsr33"]
@@ -1287,6 +1287,7 @@ MM_Icons/icons/spline_link = SubResource("AtlasTexture_fs6qc")
 MM_Icons/icons/spline_progressive = SubResource("AtlasTexture_70aex")
 MM_Icons/icons/spline_reverse = SubResource("AtlasTexture_ahanl")
 MM_Icons/icons/spline_unlink = SubResource("AtlasTexture_iofl8")
+MM_Icons/icons/steps = SubResource("AtlasTexture_l3428")
 MM_Icons/icons/view = SubResource("AtlasTexture_en6gw")
 MM_Icons/icons/zoom = SubResource("AtlasTexture_3gtjo")
 MM_LibrarySectionButton/base_type = &"Button"

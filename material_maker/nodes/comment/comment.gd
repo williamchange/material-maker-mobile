@@ -134,7 +134,7 @@ func _on_text_focus_exited():
 # Comment color
 
 func _on_change_color_pressed():
-	var light_theme = mm_globals.current_theme() == mm_globals.DEFAULT_LIGHT
+	var light_theme = ThemeUtils.is_light_theme()
 	accept_event()
 	var content_scale_factor : float = mm_globals.ui_scale_factor()
 	$Popup.get_window().content_scale_factor = content_scale_factor
@@ -245,10 +245,11 @@ func _on_text_ready() -> void:
 			_context_menu_about_to_popup.bind(%Text.get_menu()))
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_THEME_CHANGED:
-		if mm_globals.current_theme() == mm_globals.CLASSIC:
-			%Text.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
-			%Text.add_theme_stylebox_override("read_only", StyleBoxEmpty.new())
-		else:
-			%Text.remove_theme_stylebox_override("normal")
-			%Text.remove_theme_stylebox_override("read_only")
+	match what:
+		NOTIFICATION_THEME_CHANGED:
+			if ThemeUtils.is_classic_theme():
+				%Text.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+				%Text.add_theme_stylebox_override("read_only", StyleBoxEmpty.new())
+			else:
+				%Text.remove_theme_stylebox_override("normal")
+				%Text.remove_theme_stylebox_override("read_only")

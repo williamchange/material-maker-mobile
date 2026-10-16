@@ -53,8 +53,6 @@ const RECENTS_MENU_CLEAR = 1001
 const MENU_SAVE_PRESET : int = 1002
 const MENU_MANAGE_PRESETS : int = 1003
 
-const THEMES = ["Default Dark", "Default Light", "Classic"]
-
 const MENU : Array[Dictionary] = [
 	{ menu="File/New material", command="new_material", shortcut="Control+N" },
 	{ menu="File/New paint project (Experimental)", command="new_paint_project", shortcut="Control+Shift+N", not_in_ports=["HTML5"] },
@@ -353,6 +351,10 @@ func on_config_changed() -> void:
 
 	if not get_window().gui_embed_subwindows:
 		get_window().gui_embed_subwindows = mm_globals.get_config("ui_single_window_mode")
+	
+	# set custom theme
+	if mm_globals.config.get_value("window", "theme") == "custom":
+		change_theme("custom")
 
 
 func get_panel(panel_name : String) -> Control:
@@ -643,37 +645,41 @@ func _on_ExportMaterial_id_pressed(id : int) -> void:
 
 func create_menu_set_theme(menu : MMMenuManager.MenuBase) -> void:
 	menu.clear()
-	for t in THEMES:
+	for t in ThemeUtils.THEMES:
 		menu.add_item(t)
 	menu.connect_id_pressed(self._on_SetTheme_id_pressed)
 
-func change_theme(theme_name) -> void:
-	if not ResourceLoader.exists("res://material_maker/theme/"+theme_name+".tres"):
-		theme_name = "default dark"
-	var _theme = load("res://material_maker/theme/"+theme_name+".tres")
-	if _theme == theme:
+func change_theme(theme_name : String) -> void:
+	ThemeUtils.set_theme(theme_name)
+	var _theme
+	if theme_name == "custom":
+		if ThemeUtils.did_custom_params_change():
+			_theme = ThemeUtils.generate_custom_theme()
+	else:
+		ThemeUtils.clear_custom_params()
+		if not ResourceLoader.exists("res://material_maker/theme/"+theme_name+".tres"):
+			theme_name = "default dark"
+		_theme = load("res://material_maker/theme/"+theme_name+".tres")
+
+	if _theme == theme or _theme == null: 
 		return
+
 	if _theme is EnhancedTheme:
 		_theme.update()
+
 	await get_tree().process_frame
-
-	if mm_globals.get_config("touch_optimization"):
-		android_set_theme_overrides(_theme)
-
 	theme = _theme
 
-	if "classic" in theme_name:
-		RenderingServer.set_default_clear_color(Color(0.14, 0.17,0.23))
-	else:
-		RenderingServer.set_default_clear_color(
-				Color("4d4d4d") if "light" in theme_name else Color("1f1f1f"))
+	if mm_globals.get_config("touch_optimization"):
+		android_set_theme_overrides(theme)
+
+	ThemeUtils.setup_clear_color()
 	$NodeFactory.on_theme_changed()
 
-func _on_SetTheme_id_pressed(id) -> void:
-	var theme_name : String = THEMES[id].to_lower()
+func _on_SetTheme_id_pressed(id : int) -> void:
+	var theme_name : String = ThemeUtils.THEMES[id].to_lower()
 	change_theme(theme_name)
 	mm_globals.config.set_value("window", "theme", theme_name)
-
 
 func create_menu_show_panels(menu : MMMenuManager.MenuBase) -> void:
 	menu.clear()

@@ -326,9 +326,9 @@ func _draw_sensitivity_bar() -> void:
 	var accent : Color = get_theme_color("icon_pressed_color", "Button").darkened(0.2)
 	const line_width : float = 3.0
 	const bg_white : Color = Color.WHITE
-	var end : float = size.x * sensitivity
+	var end : float = maxf((size.x - 2.0) * sensitivity, 2.0)
 	var height : float = size.y - 2.0
-	var from : Vector2 = Vector2(0.0, height)
+	var from : Vector2 = Vector2(2.0, height)
 
 	# outline
 	$Edit.draw_circle(from, (line_width + 1.0) * 0.5, bg_white)
@@ -354,6 +354,10 @@ func _update_sensitivity(direction : float) -> void:
 	_show_sensitivity_tip()
 	accept_event()
 
+func _enter_tree() -> void:
+	if sensitivity == -1.0:
+		sensitivity = mm_globals.get_config("ui_field_sensitivity")
+
 func _exit_tree() -> void:
 	mm_globals.set_config("ui_field_sensitivity", sensitivity)
 
@@ -362,6 +366,8 @@ func _enter_tree() -> void:
 		sensitivity = mm_globals.get_config("ui_field_sensitivity")
 
 func _handle_sensitivity_adjustment(event : InputEvent) -> void:
+	if OS.get_name() == "Android":
+		return
 	if mode == Modes.SLIDING:
 		adjust_increment = 0.05 if event.alt_pressed else 0.1
 		if event is InputEventMouseButton:
