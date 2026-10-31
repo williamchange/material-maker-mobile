@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-    Unofficial material maker builds with touch support based on <a href="https://github.com/RodZill4/material-maker/pull/1565">PR #1565</a>
+    Unofficial <a href="https://github.com/RodZill4/material-maker">material maker</a> builds with touch support based on <a href="https://github.com/RodZill4/material-maker/pull/1565">PR #1565</a>
 </p>
 
 <p align="center">
